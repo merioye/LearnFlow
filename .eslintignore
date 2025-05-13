@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+logs
+public
+.eslintrc.js
+jest.config.js
+jest.e2e.config.js
+scripts

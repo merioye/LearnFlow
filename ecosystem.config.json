@@ -1,0 +1,19 @@
+{
+  "apps": [
+    {
+      "name": "LearnFlow",
+      "script": "dist/main.js",
+      "instances": "max",
+      "exec_mode": "cluster",
+      "autorestart": true,
+      "watch": false,
+      "time": true,
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "env-production": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}
