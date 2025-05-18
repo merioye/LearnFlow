@@ -1,7 +1,7 @@
-import { Inject, Injectable, Type } from '@nestjs/common';
+import { Injectable, Type } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 
-import { ILogger, LOGGER } from '../../logger';
+import { ILogger, InjectLogger } from '../../logger';
 import { BaseElasticsearchService } from '../services';
 
 /**
@@ -17,7 +17,7 @@ export class ElasticsearchServiceFactory {
    */
   public constructor(
     private readonly _esService: ElasticsearchService,
-    @Inject(LOGGER) private readonly _logger: ILogger
+    @InjectLogger() private readonly _logger: ILogger
   ) {}
 
   /**

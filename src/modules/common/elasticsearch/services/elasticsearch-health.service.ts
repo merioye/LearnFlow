@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { InternalServerError } from '@/common/errors';
 
-import { ILogger, LOGGER } from '../../logger';
+import { ILogger, InjectLogger } from '../../logger';
 import { TElasticSearchHealth } from '../types';
 
 /**
@@ -18,7 +18,7 @@ export class ElasticsearchHealthService {
    */
   public constructor(
     private readonly _esService: ElasticsearchService,
-    @Inject(LOGGER) private readonly _logger: ILogger
+    @InjectLogger() private readonly _logger: ILogger
   ) {}
 
   /**
@@ -28,10 +28,6 @@ export class ElasticsearchHealthService {
    * @throws Error if the health check fails
    */
   public async checkHealth(): Promise<TElasticSearchHealth> {
-    const context = {
-      name: 'ElasticsearchHealthService',
-      method: 'checkHealth',
-    };
     try {
       // Basic cluster health check
       const health = await this._esService.cluster.health();
@@ -66,7 +62,6 @@ export class ElasticsearchHealthService {
       };
     } catch (error) {
       this._logger.error('Error checking Elasticsearch health:', {
-        context,
         error,
       });
       throw new InternalServerError(
@@ -81,16 +76,11 @@ export class ElasticsearchHealthService {
    * @returns True if the cluster is reachable, false otherwise
    */
   public async ping(): Promise<boolean> {
-    const context = {
-      name: 'ElasticsearchHealthService',
-      method: 'ping',
-    };
     try {
       await this._esService.ping();
       return true;
     } catch (error) {
       this._logger.error('Elasticsearch ping failed:', {
-        context,
         error,
       });
       return false;

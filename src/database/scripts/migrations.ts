@@ -43,35 +43,23 @@ const createMigrationFile = (name: string): void => {
   `;
 
   fs.writeFileSync(filePath, template);
-  logger.info(`Migration created: ${filePath}`, {
-    name: 'Migrations',
-    method: 'createMigrationFile',
-  });
+  logger.info(`Migration created: ${filePath}`);
 };
 
 // Generate a migration based on schema changes
 const generateMigration = async (name: string): Promise<void> => {
-  const context = {
-    name: 'Migrations',
-    method: 'generateMigration',
-  };
-
   try {
     const command = `typeorm-ts-node-commonjs migration:generate src/database/migrations/${name} -d src/database/config/data-source.ts`;
-    logger.info(`Executing: ${command}`, { context });
+    logger.info(`Executing: ${command}`);
     execSync(command, { stdio: 'inherit' });
   } catch (error) {
-    logger.error('Failed to generate migration:', { context, error });
+    logger.error('Failed to generate migration:', { error });
     process.exit(1);
   }
 };
 
 // Run pending migrations
 const runMigrations = async (): Promise<void> => {
-  const context = {
-    name: 'Migrations',
-    method: 'runMigrations',
-  };
   let dataSource: DataSource | undefined;
 
   try {
@@ -79,15 +67,15 @@ const runMigrations = async (): Promise<void> => {
     const migrations = await dataSource.runMigrations();
 
     if (migrations.length === 0) {
-      logger.info('No pending migrations to execute', { context });
+      logger.info('No pending migrations to execute');
     } else {
-      logger.info(`Executed ${migrations.length} migrations:`, { context });
+      logger.info(`Executed ${migrations.length} migrations:`);
       migrations.forEach((migration) => {
-        logger.info(`- ${migration.name}`, { context });
+        logger.info(`- ${migration.name}`);
       });
     }
   } catch (error) {
-    logger.error('Error running migrations:', { context, error });
+    logger.error('Error running migrations:', { error });
     process.exit(1);
   } finally {
     if (dataSource && dataSource.isInitialized) {
@@ -98,18 +86,14 @@ const runMigrations = async (): Promise<void> => {
 
 // Revert the last executed migration
 const revertMigration = async (): Promise<void> => {
-  const context = {
-    name: 'Migrations',
-    method: 'revertMigration',
-  };
   let dataSource: DataSource | undefined;
 
   try {
     dataSource = await initDataSource();
     await dataSource.undoLastMigration();
-    logger.info('Last migration has been reverted successfully', { context });
+    logger.info('Last migration has been reverted successfully');
   } catch (error) {
-    logger.error('Error reverting migration:', { context, error });
+    logger.error('Error reverting migration:', { error });
     process.exit(1);
   } finally {
     if (dataSource && dataSource.isInitialized) {
@@ -120,10 +104,6 @@ const revertMigration = async (): Promise<void> => {
 
 // Revert all migrations
 const revertAllMigrations = async (): Promise<void> => {
-  const context = {
-    name: 'Migrations',
-    method: 'revertAllMigrations',
-  };
   let dataSource: DataSource | undefined;
 
   try {
@@ -146,19 +126,17 @@ const revertAllMigrations = async (): Promise<void> => {
       }
 
       await dataSource.undoLastMigration();
-      logger.info(`Reverted migration: ${migrations[0].name}`, { context });
+      logger.info(`Reverted migration: ${migrations[0].name}`);
       migrationCount++;
     }
 
     if (migrationCount === 0) {
-      logger.info('No migrations to revert', { context });
+      logger.info('No migrations to revert');
     } else {
-      logger.info(`All ${migrationCount} migrations have been reverted`, {
-        context,
-      });
+      logger.info(`All ${migrationCount} migrations have been reverted`);
     }
   } catch (error) {
-    logger.error('Error reverting all migrations:', { context, error });
+    logger.error('Error reverting all migrations:', { error });
     process.exit(1);
   } finally {
     if (dataSource && dataSource.isInitialized) {
@@ -169,17 +147,13 @@ const revertAllMigrations = async (): Promise<void> => {
 
 // Main function to handle different commands
 const main = async (): Promise<void> => {
-  const context = {
-    name: 'Migrations',
-    method: 'main',
-  };
   const args = process.argv.slice(2);
   const command = args[0];
 
   switch (command) {
     case 'generate':
       if (args.length < 2) {
-        logger.error('Please provide a name for the migration', { context });
+        logger.error('Please provide a name for the migration');
         process.exit(1);
       }
       await generateMigration(args[1] || '');
@@ -187,7 +161,7 @@ const main = async (): Promise<void> => {
 
     case 'create':
       if (args.length < 2) {
-        logger.error('Please provide a name for the migration', { context });
+        logger.error('Please provide a name for the migration');
         process.exit(1);
       }
       createMigrationFile(args[1] || '');
@@ -206,10 +180,9 @@ const main = async (): Promise<void> => {
       break;
 
     default:
-      logger.error(`Unknown command: ${command}`, { context });
+      logger.error(`Unknown command: ${command}`);
       logger.info(
-        'Available commands: generate, create, run, revert, revertAll',
-        { context }
+        'Available commands: generate, create, run, revert, revertAll'
       );
       process.exit(1);
   }
@@ -219,10 +192,6 @@ const main = async (): Promise<void> => {
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    const context = {
-      name: 'Migrations',
-      method: 'main',
-    };
-    logger.error('Error:', { context, error });
+    logger.error('Error:', { error });
     process.exit(1);
   });

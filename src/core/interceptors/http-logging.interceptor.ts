@@ -1,14 +1,13 @@
 import {
   CallHandler,
   ExecutionContext,
-  Inject,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { TCustomRequest } from '@/modules/app/auth';
-import { DATE_TIME, IDateTime } from '@/modules/common/helper/date-time';
-import { ILogger, LOGGER } from '@/modules/common/logger';
+import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
+import { ILogger, InjectLogger } from '@/modules/common/logger';
 import { Observable, tap } from 'rxjs';
 
 /**
@@ -20,8 +19,8 @@ import { Observable, tap } from 'rxjs';
 @Injectable()
 export class HttpLoggingInterceptor implements NestInterceptor {
   public constructor(
-    @Inject(LOGGER) private readonly _logger: ILogger,
-    @Inject(DATE_TIME) private readonly _dateTime: IDateTime
+    @InjectLogger() private readonly _logger: ILogger,
+    @InjectDateTime() private readonly _dateTime: IDateTime
   ) {}
 
   /**
@@ -39,18 +38,8 @@ export class HttpLoggingInterceptor implements NestInterceptor {
     const { method, url, ip } = req;
     const userAgent = req.headers['user-agent'] || '';
 
-    const loggerContext = {
-      name: 'HttpLoggingInterceptor',
-      method: 'intercept',
-    };
-
     const startTime = this._dateTime.timestamp;
-    this._logger.info(
-      `${method} ${url} - IP: ${ip} - UserAgent: ${userAgent}`,
-      {
-        context: loggerContext,
-      }
-    );
+    this._logger.info(`${method} ${url} - IP: ${ip} - UserAgent: ${userAgent}`);
 
     return next.handle().pipe(
       tap({
@@ -59,8 +48,7 @@ export class HttpLoggingInterceptor implements NestInterceptor {
           const responseSize = JSON.stringify(response).length;
 
           this._logger.info(
-            `${method} ${url} - ${endTime - startTime}ms - Success - Size: ${responseSize} bytes`,
-            { context: loggerContext }
+            `${method} ${url} - ${endTime - startTime}ms - Success - Size: ${responseSize} bytes`
           );
           return response;
         },
@@ -68,7 +56,7 @@ export class HttpLoggingInterceptor implements NestInterceptor {
           const endTime = this._dateTime.timestamp;
           this._logger.error(
             `${method} ${url} - ${endTime - startTime}ms - Error: ${error?.message}`,
-            { context: loggerContext, stack: error?.stack }
+            { stack: error?.stack }
           );
         },
       })

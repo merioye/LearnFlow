@@ -20,12 +20,7 @@ const data = Object.values(Resource).map((resource: string) => ({
   })),
 }));
 export const seedPermissions = async (): Promise<void> => {
-  const context = {
-    name: 'PermissionSeed',
-    method: 'seedPermissions',
-  };
-
-  logger.info('🔍 Seeding permissions started...', { context });
+  logger.info('🔍 Seeding permissions started...');
   const dateTime = new DayjsDateTimeAdapter();
 
   try {
@@ -121,8 +116,8 @@ export const seedPermissions = async (): Promise<void> => {
         await queryRunner.release();
       }
     }
-    logger.info('✅ Permission seed completed', { context });
+    logger.info('✅ Permission seed completed');
   } catch (error) {
-    logger.error('❌ Seeding permissions failed: ', { context, error });
+    logger.error('❌ Seeding permissions failed: ', { error });
   }
 };

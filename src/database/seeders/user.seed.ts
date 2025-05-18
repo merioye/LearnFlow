@@ -9,12 +9,7 @@ import { AppDataSource } from '../config';
 import { UserEntity } from '../entities';
 
 export const seedUsers = async (): Promise<void> => {
-  const context = {
-    name: 'UserSeed',
-    method: 'seedUsers',
-  };
-
-  logger.info('🔍 Seeding users started...', { context });
+  logger.info('🔍 Seeding users started...');
   const hashService = new CryptoHashService();
   const dateTime = new DayjsDateTimeAdapter();
 
@@ -69,8 +64,8 @@ export const seedUsers = async (): Promise<void> => {
       }
     );
 
-    logger.info('✅ User seed completed', { context });
+    logger.info('✅ User seed completed');
   } catch (error) {
-    logger.error('❌ Seeding users failed: ', { context, error });
+    logger.error('❌ Seeding users failed: ', { error });
   }
 };

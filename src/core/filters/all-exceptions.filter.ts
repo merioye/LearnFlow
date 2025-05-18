@@ -1,9 +1,9 @@
-import { ArgumentsHost, Catch, ExceptionFilter, Inject } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
 import { Request } from 'express';
 import { RequestValidationError } from '@/common/errors';
-import { ILogger, LOGGER } from '@/modules/common/logger';
+import { ILogger, InjectLogger } from '@/modules/common/logger';
 import { v4 as uuidv4 } from 'uuid';
 
 import { TLoggerErrorMetadata } from '@/types';
@@ -27,7 +27,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
    * @param exceptionHandlingStrategyFactory - Factory for creating exception handling strategies.
    */
   public constructor(
-    @Inject(LOGGER) private readonly _logger: ILogger,
+    @InjectLogger() private readonly _logger: ILogger,
     private readonly _httpAdapterHost: HttpAdapterHost,
     private readonly _configService: ConfigService,
     private readonly _exceptionHandlingStrategyFactory: ExceptionHandlingStrategyFactory

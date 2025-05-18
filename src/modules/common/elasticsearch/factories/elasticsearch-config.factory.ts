@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { IndicesIndexSettings } from '@elastic/elasticsearch/lib/api/types';
 
-import { ILogger, LOGGER } from '../../logger';
+import { ILogger, InjectLogger } from '../../logger';
 import { TElasticsearchIndexConfig } from '../types';
 
 /**
@@ -19,7 +19,7 @@ export class ElasticsearchConfigFactory {
    */
   public constructor(
     private readonly _esService: ElasticsearchService,
-    @Inject(LOGGER) private readonly _logger: ILogger
+    @InjectLogger() private readonly _logger: ILogger
   ) {}
 
   /**
@@ -31,10 +31,6 @@ export class ElasticsearchConfigFactory {
    */
   public async createIndex(config: TElasticsearchIndexConfig): Promise<void> {
     const { index, mappings, settings, aliases } = config;
-    const context = {
-      name: 'ElasticsearchConfigFactory',
-      method: 'createIndex',
-    };
 
     try {
       // Check if index exists
@@ -66,13 +62,9 @@ export class ElasticsearchConfigFactory {
           // },
         });
 
-        this._logger.info(`Index ${index} created successfully`, {
-          context,
-        });
+        this._logger.info(`Index ${index} created successfully`);
       } else {
-        this._logger.info(`Index ${index} already exists`, {
-          context,
-        });
+        this._logger.info(`Index ${index} already exists`);
 
         // Optionally update mappings if index exists
         // Uncomment if you want to update existing mappings, but be cautious in production
@@ -80,13 +72,10 @@ export class ElasticsearchConfigFactory {
           index,
           body: mappings as Record<string, unknown>,
         });
-        this._logger.info(`Index ${index} mappings updated`, {
-          context,
-        });
+        this._logger.info(`Index ${index} mappings updated`);
       }
     } catch (error) {
       this._logger.error(`Error creating/checking index ${index}:`, {
-        context,
         error,
       });
       throw error;
@@ -105,21 +94,14 @@ export class ElasticsearchConfigFactory {
     index: string,
     mappings: Record<string, unknown>
   ): Promise<void> {
-    const loggerContext = {
-      name: 'ElasticsearchConfigFactory',
-      method: 'updateMappings',
-    };
     try {
       await this._esService.indices.putMapping({
         index,
         body: mappings,
       });
-      this._logger.info(`Index ${index} mappings updated successfully`, {
-        context: loggerContext,
-      });
+      this._logger.info(`Index ${index} mappings updated successfully`);
     } catch (error) {
       this._logger.error(`Error updating mappings for index ${index}:`, {
-        context: loggerContext,
         error,
       });
       throw error;
@@ -138,22 +120,15 @@ export class ElasticsearchConfigFactory {
     index: string,
     settings: IndicesIndexSettings
   ): Promise<void> {
-    const loggerContext = {
-      name: 'ElasticsearchConfigFactory',
-      method: 'updateSettings',
-    };
     try {
       await this._esService.indices.putSettings({
         index,
         settings,
         // body: settings,
       });
-      this._logger.info(`Index ${index} settings updated successfully`, {
-        context: loggerContext,
-      });
+      this._logger.info(`Index ${index} settings updated successfully`);
     } catch (error) {
       this._logger.error(`Error updating settings for index ${index}:`, {
-        context: loggerContext,
         error,
       });
       throw error;
@@ -168,18 +143,11 @@ export class ElasticsearchConfigFactory {
    * @throws Error if the deletion fails
    */
   public async deleteIndex(index: string): Promise<void> {
-    const loggerContext = {
-      name: 'ElasticsearchConfigFactory',
-      method: 'deleteIndex',
-    };
     try {
       await this._esService.indices.delete({ index });
-      this._logger.info(`Index ${index} deleted successfully`, {
-        context: loggerContext,
-      });
+      this._logger.info(`Index ${index} deleted successfully`);
     } catch (error) {
       this._logger.error(`Error deleting index ${index}:`, {
-        context: loggerContext,
         error,
       });
       throw error;

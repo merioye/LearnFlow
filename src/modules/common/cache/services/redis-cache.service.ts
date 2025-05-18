@@ -1,6 +1,5 @@
 import {
   ExecutionContext,
-  Inject,
   Injectable,
   OnModuleDestroy,
   OnModuleInit,
@@ -11,8 +10,8 @@ import Redis from 'ioredis';
 import { cacheOptions } from '@/config';
 import { RedisDB } from '@/enums';
 
-import { HASH_SERVICE, HashAlgorithm, IHashService } from '../../hash';
-import { ILogger, LOGGER } from '../../logger';
+import { HashAlgorithm, IHashService, InjectHashService } from '../../hash';
+import { ILogger, InjectLogger } from '../../logger';
 import { ICacheService } from '../interfaces';
 
 /**
@@ -27,8 +26,8 @@ export class RedisCacheService
   private readonly _client: Redis;
 
   public constructor(
-    @Inject(HASH_SERVICE) private readonly _hashService: IHashService,
-    @Inject(LOGGER) private readonly _logger: ILogger
+    @InjectHashService() private readonly _hashService: IHashService,
+    @InjectLogger() private readonly _logger: ILogger
   ) {
     this._client = new Redis({
       ...cacheOptions,
@@ -36,8 +35,8 @@ export class RedisCacheService
     });
 
     // Error handling
-    this._client.on('error', (err) =>
-      this._logger.error('API Cache Client Error', err)
+    this._client.on('error', (error: Error) =>
+      this._logger.error('API Cache Client Error', { error })
     );
     this._client.on('connect', () =>
       this._logger.info('API Cache Client Connected 🚀')
@@ -73,21 +72,14 @@ export class RedisCacheService
    * @inheritdoc
    */
   public async connect(): Promise<void> {
-    const context = {
-      name: 'CacheService',
-      method: 'connect',
-    };
-
     if (!this._client.status || this._client.status !== 'ready') {
       this._logger.info(
-        'Waiting for API Cache client connection to be ready...',
-        { context }
+        'Waiting for API Cache client connection to be ready...'
       );
       await new Promise((resolve) => this._client.once('ready', resolve));
     }
     this._logger.info(
-      `API Cache client initialized using database ${RedisDB.API_CACHE}`,
-      { context }
+      `API Cache client initialized using database ${RedisDB.API_CACHE}`
     );
   }
 
@@ -95,16 +87,10 @@ export class RedisCacheService
    * @inheritdoc
    */
   public async disconnect(): Promise<void> {
-    const context = {
-      name: 'CacheService',
-      method: 'disconnect',
-    };
-
     try {
       await this._client.quit();
     } catch (error) {
       this._logger.error('Failed to disconnect from API Cache:', {
-        context,
         error,
       });
       throw error;
@@ -176,13 +162,8 @@ export class RedisCacheService
    * @inheritdoc
    */
   public async clearAll(): Promise<void> {
-    const context = {
-      name: 'CacheService',
-      method: 'clearAll',
-    };
-
     await this._client.flushdb();
-    this._logger.info('API Cache database cleared', { context });
+    this._logger.info('API Cache database cleared');
   }
 
   /**

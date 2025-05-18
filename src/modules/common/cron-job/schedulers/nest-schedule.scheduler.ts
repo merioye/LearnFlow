@@ -1,9 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 
-import { DATE_TIME, IDateTime } from '../../helper/date-time';
-import { ILogger, LOGGER } from '../../logger';
+import { IDateTime, InjectDateTime } from '../../helper/date-time';
+import { ILogger, InjectLogger } from '../../logger';
 import { ICronJobScheduler } from '../interfaces';
 import { TCronJobOptions, TScheduleParams } from '../types';
 
@@ -16,8 +16,8 @@ import { TCronJobOptions, TScheduleParams } from '../types';
 @Injectable()
 export class NestScheduleScheduler implements ICronJobScheduler {
   public constructor(
-    @Inject(LOGGER) private readonly _logger: ILogger,
-    @Inject(DATE_TIME) private readonly _dateTime: IDateTime,
+    @InjectLogger() private readonly _logger: ILogger,
+    @InjectDateTime() private readonly _dateTime: IDateTime,
     private readonly _schedulerRegistry: SchedulerRegistry
   ) {}
 
@@ -25,11 +25,6 @@ export class NestScheduleScheduler implements ICronJobScheduler {
    * @inheritdoc
    */
   public schedule(params: TScheduleParams): void {
-    const context = {
-      name: 'CronJobScheduler',
-      method: 'schedule',
-    };
-
     const { name, cronTime, callback, options } = params;
     try {
       const job = new CronJob(
@@ -50,8 +45,7 @@ export class NestScheduleScheduler implements ICronJobScheduler {
         'yyyy-MM-dd HH:mm:ss'
       );
       this._logger.info(
-        `Scheduled job: ${name}${options?.description ? ` (${options?.description})` : ''} to run at ${runAt}`,
-        { context }
+        `Scheduled job: ${name}${options?.description ? ` (${options?.description})` : ''} to run at ${runAt}`
       );
 
       if (options?.runOnInit) {
@@ -59,7 +53,6 @@ export class NestScheduleScheduler implements ICronJobScheduler {
       }
     } catch (error) {
       this._logger.error(`Failed to schedule job ${name}: `, {
-        context,
         error,
       });
       throw error;
@@ -97,15 +90,9 @@ export class NestScheduleScheduler implements ICronJobScheduler {
     callback: () => Promise<void>,
     options: TCronJobOptions
   ): () => Promise<void> {
-    const context = {
-      name: 'CronJobScheduler',
-      method: '_createJobCallback',
-    };
-
     return async () => {
       this._logger.info(
-        `Executing job: ${name}${options?.description ? ` (${options?.description})` : ''} at ${this._dateTime.format(this._dateTime.toUTC(new Date()), 'yyyy-MM-dd HH:mm:ss')}`,
-        { context }
+        `Executing job: ${name}${options?.description ? ` (${options?.description})` : ''} at ${this._dateTime.format(this._dateTime.toUTC(new Date()), 'yyyy-MM-dd HH:mm:ss')}`
       );
       if (options?.timeout) {
         await this._executeWithTimeout(name, callback, options.timeout);

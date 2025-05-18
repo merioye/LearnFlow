@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DATE_TIME, IDateTime } from '@/modules/common/helper/date-time';
-import { ILogger, LOGGER } from '@/modules/common/logger';
+import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
+import { ILogger, InjectLogger } from '@/modules/common/logger';
 import { DataSource } from 'typeorm';
 
 import { TDatabaseHealth } from '../types';
@@ -17,8 +17,8 @@ export class DatabaseHealthService {
 
   public constructor(
     @InjectDataSource() private readonly _dataSource: DataSource,
-    @Inject(LOGGER) private readonly _logger: ILogger,
-    @Inject(DATE_TIME) private readonly _dateTime: IDateTime
+    @InjectLogger() private readonly _logger: ILogger,
+    @InjectDateTime() private readonly _dateTime: IDateTime
   ) {}
 
   /**
@@ -26,11 +26,6 @@ export class DatabaseHealthService {
    * @returns Promise resolving to boolean
    */
   async ping(): Promise<boolean> {
-    const context = {
-      name: 'DatabaseHealthService',
-      method: 'ping',
-    };
-
     try {
       // Execute a simple query
       await this._dataSource.query('SELECT 1');
@@ -38,7 +33,6 @@ export class DatabaseHealthService {
       return true;
     } catch (error) {
       this._logger.error('Database ping failed:', {
-        context,
         error,
       });
       this._isConnected = false;
@@ -51,11 +45,6 @@ export class DatabaseHealthService {
    * @returns Health status object with detailed information
    */
   public async checkHealth(): Promise<TDatabaseHealth> {
-    const context = {
-      name: 'DatabaseHealthService',
-      method: 'checkHealth',
-    };
-
     try {
       const startTime = this._dateTime.timestamp;
 
@@ -68,7 +57,6 @@ export class DatabaseHealthService {
         hasPendingMigrations = await this._dataSource.showMigrations();
       } catch (error) {
         this._logger.warn('Could not check pending migrations', {
-          context,
           error,
         });
       }

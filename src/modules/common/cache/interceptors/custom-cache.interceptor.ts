@@ -9,7 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Observable, of, tap } from 'rxjs';
 
-import { ILogger, LOGGER } from '../../logger';
+import { ILogger, InjectLogger } from '../../logger';
 import {
   CACHE_CONFIG,
   CACHE_KEY_SUFFIX_DECORATOR_KEY,
@@ -32,7 +32,7 @@ export class CustomCacheInterceptor implements NestInterceptor {
   public constructor(
     @Inject(CACHE_CONFIG) private readonly _cacheConfig: TCacheModuleOptions,
     @Inject(CACHE_SERVICE) private readonly _cacheService: ICacheService,
-    @Inject(LOGGER) private readonly _logger: ILogger,
+    @InjectLogger() private readonly _logger: ILogger,
     private readonly _reflector: Reflector
   ) {}
 
@@ -50,23 +50,15 @@ export class CustomCacheInterceptor implements NestInterceptor {
       return next.handle();
     }
 
-    const loggerContext = {
-      name: 'CustomCacheInterceptor',
-      method: 'intercept',
-    };
     const suffix = this._getCacheSuffix(context);
     const key = await this._cacheService.generateCacheKey(context, suffix);
     const cachedData = await this._cacheService.get(key);
 
     if (cachedData) {
-      this._logger.debug(`API Cache hit for key: ${key}`, {
-        context: loggerContext,
-      });
+      this._logger.debug(`API Cache hit for key: ${key}`);
       return of(cachedData);
     } else {
-      this._logger.debug(`API Cache miss for key: ${key}`, {
-        context: loggerContext,
-      });
+      this._logger.debug(`API Cache miss for key: ${key}`);
     }
 
     const ttl = this._getTTL(context);

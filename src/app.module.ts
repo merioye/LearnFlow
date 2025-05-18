@@ -26,8 +26,7 @@ import { ApplicationModule } from './modules/app';
 import { CommonAppModule } from './modules/common';
 import { CACHE_SERVICE, ICacheService } from './modules/common/cache';
 import { ILogger, LOGGER } from './modules/common/logger';
-
-// import { MetricsInterceptor } from './modules/common/metrics';
+import { MetricsInterceptor } from './modules/common/metrics';
 
 /**
  * The application module
@@ -86,7 +85,7 @@ import { ILogger, LOGGER } from './modules/common/logger';
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: HttpLoggingInterceptor },
-    // { provide: APP_INTERCEPTOR, useClass: MetricsInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: MetricsInterceptor },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     {
       provide: APP_PIPE,

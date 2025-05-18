@@ -2,6 +2,7 @@ import { Controller, Get, Header } from '@nestjs/common';
 
 import { ENDPOINTS } from '@/constants';
 
+import { ILogger, InjectLogger } from '../logger';
 import { MetricsService } from './services';
 
 /**
@@ -14,7 +15,10 @@ import { MetricsService } from './services';
  */
 @Controller(ENDPOINTS.Metrics.Base)
 export class MetricsController {
-  public constructor(private readonly _metricsService: MetricsService) {}
+  public constructor(
+    private readonly _metricsService: MetricsService,
+    @InjectLogger() private readonly _logger: ILogger
+  ) {}
 
   /**
    * Handles GET requests to fetch metrics as a plain text string.
@@ -27,6 +31,7 @@ export class MetricsController {
   @Get()
   @Header('Content-Type', 'text/plain')
   async getMetrics(): Promise<string> {
+    this._logger.info('Request to fetch application metrics...');
     return await this._metricsService.getMetricsAsString();
   }
 }

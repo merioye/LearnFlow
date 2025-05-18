@@ -12,6 +12,7 @@ import { Environment } from '@/enums';
 export type TLoggerModuleOptions = {
   environment: Environment;
   logsDirPath: string;
+  rootDir?: string;
   debugMode: boolean;
   appName: string;
 };
@@ -21,6 +22,13 @@ export type TLogInfo = {
   level: string;
   message: string;
   correlation_id?: string;
+  caller?: TLogCaller;
   stack?: string;
   metadata?: Record<string, any>;
+};
+
+export type TLogCaller = {
+  methodName: string;
+  filePath: string;
+  lineNumber: number;
 };

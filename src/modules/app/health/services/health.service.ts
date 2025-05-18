@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 // import { ElasticsearchHealthService } from '@/modules/common/elasticsearch';
-import { DATE_TIME, IDateTime } from '@/modules/common/helper/date-time';
+import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 
 import { DatabaseHealthService } from '@/database';
 
@@ -16,7 +16,7 @@ export class HealthService {
   public constructor(
     // private readonly _esHealthService: ElasticsearchHealthService,
     private readonly _dbHealthService: DatabaseHealthService,
-    @Inject(DATE_TIME) private readonly _dateTime: IDateTime
+    @InjectDateTime() private readonly _dateTime: IDateTime
   ) {}
   /**
    * Returns the health information about the application.

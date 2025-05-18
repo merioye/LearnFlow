@@ -1,5 +1,5 @@
-import { Controller, Get, Inject } from '@nestjs/common';
-import { ILogger, LOGGER } from '@/modules/common/logger';
+import { Controller, Get } from '@nestjs/common';
+import { ILogger, InjectLogger } from '@/modules/common/logger';
 
 import { ENDPOINTS } from '@/constants';
 
@@ -22,7 +22,7 @@ export class HealthController {
    *   providing the health information.
    */
   public constructor(
-    @Inject(LOGGER) private readonly _logger: ILogger,
+    @InjectLogger() private readonly _logger: ILogger,
     private readonly _healthService: HealthService
   ) {}
 

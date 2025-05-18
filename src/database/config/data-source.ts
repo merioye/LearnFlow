@@ -17,7 +17,7 @@ dotenv.config({
 // });
 
 // cacheClient.on('error', (err) =>
-//   logger.error('Database Cache Client Error', err)
+//   logger.error('Database Cache Client Error', { error: err })
 // );
 // cacheClient.on('connect', () =>
 //   logger.info('Database Cache Client Connected 🚀')

@@ -9,8 +9,9 @@ export const ENDPOINTS = {
     Base: '/metrics',
   },
   Auth: {
+    Base: '/auth',
     Post: {
-      Login: '/auth/login',
+      Login: '/login',
     },
   },
 } as const;

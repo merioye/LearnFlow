@@ -1,14 +1,14 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 
 import { CORRELATION_ID } from '@/constants';
 
-import { DATE_TIME, IDateTime } from '../../helper/date-time';
-import { ILogger, LOGGER, LoggerContextNamespace } from '../../logger';
+import { IDateTime, InjectDateTime } from '../../helper/date-time';
+import { ILogger, InjectLogger, LoggerContextNamespace } from '../../logger';
 import {
-  CRON_JOB_GLOBAL_OPTIONS,
-  CRON_JOB_SCHEDULER,
-  CRON_JOBS,
-} from '../constants';
+  InjectCronJobGlobalOptions,
+  InjectCronJobs,
+  InjectCronJobScheduler,
+} from '../decorators';
 import { CronJobStatus } from '../enums';
 import {
   ICronJobScheduler,
@@ -47,15 +47,15 @@ export class CronJobService implements ICronJobService, OnModuleInit {
   private _jobStateMap = new Map<string, TCronJobStateWithLastError>();
 
   public constructor(
-    @Inject(LOGGER)
+    @InjectLogger()
     private readonly _logger: ILogger,
-    @Inject(DATE_TIME)
+    @InjectDateTime()
     private readonly _dateTime: IDateTime,
-    @Inject(CRON_JOB_SCHEDULER)
+    @InjectCronJobScheduler()
     private readonly _jobScheduler: ICronJobScheduler,
-    @Inject(CRON_JOBS)
+    @InjectCronJobs()
     private readonly _jobs: TCronJobConfig[],
-    @Inject(CRON_JOB_GLOBAL_OPTIONS)
+    @InjectCronJobGlobalOptions()
     private readonly _globalOptions?: Partial<TCronJobOptions>
   ) {}
 
@@ -71,15 +71,9 @@ export class CronJobService implements ICronJobService, OnModuleInit {
    * @inheritdoc
    */
   public registerTask(name: string, task: ICronJobTask): void {
-    const context = {
-      name: 'CronJobService',
-      method: 'registerTask',
-    };
-
     if (this._tasks.has(name)) {
       this._logger.warn(
-        `Task ${name} is already registered. Overwriting existing task.`,
-        { context }
+        `Task ${name} is already registered. Overwriting existing task.`
       );
     }
     this._tasks.set(name, task);
@@ -124,15 +118,9 @@ export class CronJobService implements ICronJobService, OnModuleInit {
    * @returns {void}
    */
   private _scheduleJob(job: TCronJobConfig): void {
-    const context = {
-      name: 'CronJobService',
-      method: '_scheduleJob',
-    };
-
     if (!this._tasks.has(job.name)) {
       this._logger.error(
-        `Task ${job.name} not registered. Job will not be scheduled.`,
-        { context }
+        `Task ${job.name} not registered. Job will not be scheduled.`
       );
       return;
     }
@@ -151,7 +139,6 @@ export class CronJobService implements ICronJobService, OnModuleInit {
       });
     } catch (error) {
       this._logger.error(`Failed to schedule job ${job.name}: `, {
-        context,
         error,
       });
     }
@@ -167,11 +154,6 @@ export class CronJobService implements ICronJobService, OnModuleInit {
     name: string,
     context: Record<string, any> = {}
   ): () => Promise<void> {
-    const loggerContext = {
-      name: 'CronJobService',
-      method: '_createJobExecutor',
-    };
-
     return async () => {
       // Generate a correlation ID for this job execution
       const correlationId = this._generateCorrelationId(name);
@@ -183,9 +165,7 @@ export class CronJobService implements ICronJobService, OnModuleInit {
 
         const task = this._tasks.get(name);
         if (!task) {
-          this._logger.error(`Task ${name} not found`, {
-            context: loggerContext,
-          });
+          this._logger.error(`Task ${name} not found`);
           return;
         }
 
@@ -225,7 +205,6 @@ export class CronJobService implements ICronJobService, OnModuleInit {
           state.errorCount++;
 
           this._logger.error(`Job ${name} execution failed: `, {
-            context: loggerContext,
             error,
           });
           if (task.onError) {

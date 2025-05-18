@@ -50,11 +50,6 @@ export abstract class BaseElasticsearchService<T extends object> {
    * @throws Error if indexing fails
    */
   public async index(document: T, id?: string): Promise<IndexResponse> {
-    const context = {
-      name: 'BaseElasticsearchService',
-      method: 'index',
-    };
-
     try {
       const params: IndexRequest<T> = {
         index: this.indexName,
@@ -66,7 +61,6 @@ export abstract class BaseElasticsearchService<T extends object> {
       return await this.esService.index(params);
     } catch (error) {
       this.logger.error(`Error indexing document in ${this.indexName}:`, {
-        context,
         error,
       });
       throw error;
@@ -85,11 +79,6 @@ export abstract class BaseElasticsearchService<T extends object> {
     documents: T[],
     idField?: keyof T
   ): Promise<TBulkIndexResult> {
-    const context = {
-      name: 'BaseElasticsearchService',
-      method: 'bulkIndex',
-    };
-
     try {
       if (documents.length === 0) return { success: true, count: 0 };
 
@@ -111,7 +100,7 @@ export abstract class BaseElasticsearchService<T extends object> {
         this.logger.warn(
           `Some errors occurred during bulk indexing in ${this.indexName}`,
           {
-            context,
+            errors: response.errors,
           }
         );
       }
@@ -124,7 +113,6 @@ export abstract class BaseElasticsearchService<T extends object> {
       };
     } catch (error) {
       this.logger.error(`Error bulk indexing documents in ${this.indexName}:`, {
-        context,
         error,
       });
       throw error;
@@ -141,11 +129,6 @@ export abstract class BaseElasticsearchService<T extends object> {
   public async search(
     params: TElasticsearchSearchParams = {}
   ): Promise<TElasticsearchSearchResult<T>> {
-    const context = {
-      name: 'BaseElasticsearchService',
-      method: 'search',
-    };
-
     try {
       const {
         query,
@@ -189,7 +172,6 @@ export abstract class BaseElasticsearchService<T extends object> {
       };
     } catch (error) {
       this.logger.error(`Error searching in index ${this.indexName}:`, {
-        context,
         error,
       });
       throw error;
@@ -204,11 +186,6 @@ export abstract class BaseElasticsearchService<T extends object> {
    * @throws Error if the retrieval fails for reasons other than document not found
    */
   public async findById(id: string): Promise<T | null> {
-    const context = {
-      name: 'BaseElasticsearchService',
-      method: 'findById',
-    };
-
     try {
       const response: GetResponse = await this.esService.get({
         index: this.indexName,
@@ -221,7 +198,6 @@ export abstract class BaseElasticsearchService<T extends object> {
         return null;
       }
       this.logger.error(`Error finding document by ID in ${this.indexName}:`, {
-        context,
         error,
       });
       throw error;
@@ -240,11 +216,6 @@ export abstract class BaseElasticsearchService<T extends object> {
     id: string,
     document: Partial<T>
   ): Promise<UpdateResponse<T>> {
-    const context = {
-      name: 'BaseElasticsearchService',
-      method: 'update',
-    };
-
     try {
       return await this.esService.update({
         index: this.indexName,
@@ -257,7 +228,6 @@ export abstract class BaseElasticsearchService<T extends object> {
       });
     } catch (error) {
       this.logger.error(`Error updating document by ID in ${this.indexName}:`, {
-        context,
         error,
       });
       throw error;
@@ -272,11 +242,6 @@ export abstract class BaseElasticsearchService<T extends object> {
    * @throws Error if the deletion fails
    */
   public async delete(id: string): Promise<DeleteResponse> {
-    const context = {
-      name: 'BaseElasticsearchService',
-      method: 'delete',
-    };
-
     try {
       return await this.esService.delete({
         index: this.indexName,
@@ -285,7 +250,6 @@ export abstract class BaseElasticsearchService<T extends object> {
       });
     } catch (error) {
       this.logger.error(`Error deleting document by ID in ${this.indexName}:`, {
-        context,
         error,
       });
       throw error;
@@ -303,11 +267,6 @@ export abstract class BaseElasticsearchService<T extends object> {
     // query: Record<string, unknown>
     query: QueryDslQueryContainer
   ): Promise<DeleteByQueryResponse> {
-    const context = {
-      name: 'BaseElasticsearchService',
-      method: 'deleteByQuery',
-    };
-
     try {
       return await this.esService.deleteByQuery({
         index: this.indexName,
@@ -321,7 +280,6 @@ export abstract class BaseElasticsearchService<T extends object> {
       this.logger.error(
         `Error deleting documents by query in ${this.indexName}:`,
         {
-          context,
           error,
         }
       );
@@ -340,11 +298,6 @@ export abstract class BaseElasticsearchService<T extends object> {
     // query: Record<string, unknown> = { match_all: {} }
     query: QueryDslQueryContainer = { match_all: {} }
   ): Promise<number> {
-    const context = {
-      name: 'BaseElasticsearchService',
-      method: 'count',
-    };
-
     try {
       const response = await this.esService.count({
         index: this.indexName,
@@ -357,7 +310,6 @@ export abstract class BaseElasticsearchService<T extends object> {
       return response.count;
     } catch (error) {
       this.logger.error(`Error counting documents in ${this.indexName}:`, {
-        context,
         error,
       });
       throw error;
@@ -371,18 +323,12 @@ export abstract class BaseElasticsearchService<T extends object> {
    * @throws Error if the refresh operation fails
    */
   public async refreshIndex(): Promise<IndicesRefreshResponse> {
-    const context = {
-      name: 'BaseElasticsearchService',
-      method: 'refreshIndex',
-    };
-
     try {
       return await this.esService.indices.refresh({
         index: this.indexName,
       });
     } catch (error) {
       this.logger.error(`Error refreshing index ${this.indexName}:`, {
-        context,
         error,
       });
       throw error;

@@ -46,7 +46,7 @@ async function bootstrap(): Promise<void> {
   await app.listen(PORT!, () => {
     logger.info(`Application is running on ${APP_DOMAIN}:${PORT}`);
     logger.info(
-      `Metrics available at ${APP_DOMAIN}:${PORT}/${API_PREFIX}/${API_DEFAULT_VERSION}/${ENDPOINTS.Metrics.Base}`
+      `Metrics available at ${APP_DOMAIN}:${PORT}/${API_PREFIX}/v${API_DEFAULT_VERSION}${ENDPOINTS.Metrics.Base}`
     );
   });
 }

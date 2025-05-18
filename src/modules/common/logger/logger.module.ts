@@ -20,11 +20,17 @@ export class LoggerModule {
    * @returns The dynamic module for the global Logger instance.
    */
   public static forRoot(options: TLoggerModuleOptions): DynamicModule {
+    // Set default rootDir to project root if not provided
+    const rootDir = options.rootDir || process.cwd();
+
     return {
       global: true,
       module: LoggerModule,
       providers: [
-        { provide: LOGGER, useValue: WinstonLogger.getInstance(options) },
+        {
+          provide: LOGGER,
+          useValue: WinstonLogger.getInstance({ ...options, rootDir }),
+        },
       ],
       exports: [LOGGER],
     };
