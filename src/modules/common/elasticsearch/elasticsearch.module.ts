@@ -6,7 +6,10 @@ import {
   ElasticsearchConfigFactory,
   ElasticsearchServiceFactory,
 } from './factories';
-import { ElasticsearchHealthService } from './services';
+import {
+  ElasticsearchHealthService,
+  ElasticsearchQueryBuilder,
+} from './services';
 import {
   TElasticsearchModuleAsyncOptions,
   TElasticsearchModuleOptions,
@@ -37,12 +40,14 @@ export class ElasticsearchModule {
           provide: ELASTICSEARCH_MODULE_OPTIONS,
           useValue: options,
         },
+        ElasticsearchQueryBuilder,
         ElasticsearchConfigFactory,
         ElasticsearchServiceFactory,
         ElasticsearchHealthService,
       ],
       exports: [
         NestElasticsearchModule,
+        ElasticsearchQueryBuilder,
         ElasticsearchConfigFactory,
         ElasticsearchServiceFactory,
         ElasticsearchHealthService,
@@ -72,12 +77,14 @@ export class ElasticsearchModule {
       ],
       providers: [
         this._createAsyncOptionsProvider(options),
+        ElasticsearchQueryBuilder,
         ElasticsearchConfigFactory,
         ElasticsearchServiceFactory,
         ElasticsearchHealthService,
       ],
       exports: [
         NestElasticsearchModule,
+        ElasticsearchQueryBuilder,
         ElasticsearchConfigFactory,
         ElasticsearchServiceFactory,
         ElasticsearchHealthService,

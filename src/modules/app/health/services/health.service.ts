@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ElasticsearchHealthService } from '@/modules/common/elasticsearch';
+// import { ElasticsearchHealthService } from '@/modules/common/elasticsearch';
 import { DATE_TIME, IDateTime } from '@/modules/common/helper/date-time';
 
 import { DatabaseHealthService } from '@/database';
@@ -14,7 +14,7 @@ import { THealth, TPong } from '../types';
 @Injectable()
 export class HealthService {
   public constructor(
-    private readonly _esHealthService: ElasticsearchHealthService,
+    // private readonly _esHealthService: ElasticsearchHealthService,
     private readonly _dbHealthService: DatabaseHealthService,
     @Inject(DATE_TIME) private readonly _dateTime: IDateTime
   ) {}
@@ -30,7 +30,7 @@ export class HealthService {
         status: 'OK',
       },
       database: await this._dbHealthService.checkHealth(),
-      elasticSearch: await this._esHealthService.checkHealth(),
+      // elasticSearch: await this._esHealthService.checkHealth(),
     };
   }
 
@@ -45,10 +45,10 @@ export class HealthService {
         available: await this._dbHealthService.ping(),
         timestamp: this._dateTime.toUTC(this._dateTime.now()),
       },
-      elasticSearch: {
-        available: await this._esHealthService.ping(),
-        timestamp: this._dateTime.toUTC(this._dateTime.now()),
-      },
+      // elasticSearch: {
+      //   available: await this._esHealthService.ping(),
+      //   timestamp: this._dateTime.toUTC(this._dateTime.now()),
+      // },
     };
   }
 }

@@ -1,7 +1,9 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 
+import { CORRELATION_ID } from '@/constants';
+
 import { DATE_TIME, IDateTime } from '../../helper/date-time';
-import { ILogger, LOGGER } from '../../logger';
+import { ILogger, LOGGER, LoggerContextNamespace } from '../../logger';
 import {
   CRON_JOB_GLOBAL_OPTIONS,
   CRON_JOB_SCHEDULER,
@@ -171,51 +173,81 @@ export class CronJobService implements ICronJobService, OnModuleInit {
     };
 
     return async () => {
-      const task = this._tasks.get(name);
-      if (!task) {
-        this._logger.error(`Task ${name} not found`, {
-          context: loggerContext,
-        });
-        return;
-      }
+      // Generate a correlation ID for this job execution
+      const correlationId = this._generateCorrelationId(name);
 
-      const state = this._jobStateMap.get(name) || {
-        status: CronJobStatus.ACTIVE,
-        executionCount: 0,
-        errorCount: 0,
-      };
+      // Run the job execution within the CLS namespace context
+      await LoggerContextNamespace.runPromise(async () => {
+        // Set the correlation ID in the namespace
+        LoggerContextNamespace.set(CORRELATION_ID, correlationId);
 
-      try {
-        state.lastExecution = this._dateTime.toUTC(this._dateTime.now());
-        // Pass both context and job metadata
-        await task.execute({
-          jobName: name,
-          timestamp: this._dateTime.toUTC(this._dateTime.now()),
-          params: context,
-        });
+        const task = this._tasks.get(name);
+        if (!task) {
+          this._logger.error(`Task ${name} not found`, {
+            context: loggerContext,
+          });
+          return;
+        }
 
-        // Update state on success
-        state.status = CronJobStatus.ACTIVE;
-        state.executionCount++;
-      } catch (error) {
-        // Update state on error
-        state.status = CronJobStatus.ERROR;
-        state.lastError = error as Error;
-        state.errorCount++;
+        const state = this._jobStateMap.get(name) || {
+          status: CronJobStatus.ACTIVE,
+          executionCount: 0,
+          errorCount: 0,
+        };
 
-        this._logger.error(`Job ${name} execution failed: `, {
-          context,
-          error,
-        });
-        if (task.onError) {
-          await task.onError(error as Error, {
+        try {
+          state.lastExecution = this._dateTime.toUTC(this._dateTime.now());
+
+          // Log job execution
+          this._logger.info(`Starting cron job execution: ${name}`, {
+            jobName: name,
+          });
+
+          // Pass both context, job metadata and correlation ID
+          await task.execute({
             jobName: name,
             timestamp: this._dateTime.toUTC(this._dateTime.now()),
-            params: context,
+            params: { ...context, [CORRELATION_ID]: correlationId },
           });
+
+          // Update state on success
+          state.status = CronJobStatus.ACTIVE;
+          state.executionCount++;
+
+          // Log successful completion
+          this._logger.info(`Completed cron job execution: ${name}`, {
+            jobName: name,
+          });
+        } catch (error) {
+          // Update state on error
+          state.status = CronJobStatus.ERROR;
+          state.lastError = error as Error;
+          state.errorCount++;
+
+          this._logger.error(`Job ${name} execution failed: `, {
+            context: loggerContext,
+            error,
+          });
+          if (task.onError) {
+            await task.onError(error as Error, {
+              jobName: name,
+              timestamp: this._dateTime.toUTC(this._dateTime.now()),
+              params: { ...context, [CORRELATION_ID]: correlationId },
+            });
+          }
         }
-      }
-      this._jobStateMap.set(name, state);
+        this._jobStateMap.set(name, state);
+      });
     };
+  }
+
+  /**
+   * Generates a correlation ID for a cron job
+   *
+   * @param {string} jobName - The name of the job
+   * @returns {string} - Generated correlation ID
+   */
+  private _generateCorrelationId(jobName: string): string {
+    return `cron-${jobName}-${this._dateTime.timestamp.toString(36)}-${Math.random().toString(36).substring(2)}`;
   }
 }

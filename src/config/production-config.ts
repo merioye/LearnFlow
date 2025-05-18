@@ -41,7 +41,7 @@ export function setupProductionApp(
   app.use(compression());
 
   // Enable trust proxy for secure cookies behind reverse proxy
-  if (configService.get(Config.BEHIND_PROXY) === 'true') {
+  if (configService.get(Config.BEHIND_PROXY) === true) {
     app.enableCors({
       origin:
         configService.get<string>(Config.ALLOWED_ORIGINS)?.split(',') || false,

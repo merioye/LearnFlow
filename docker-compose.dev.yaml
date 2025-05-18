@@ -1,8 +1,8 @@
 services:
   minio:
     image: minio/minio:latest
-    container_name: minio
-    restart: unless-stopped
+    container_name: minio-dev
+    restart: unless-stopped # Automatically restart container if it crashes or on system reboot
     ports:
       - '9000:9000' # API endpoint
       - '9001:9001' # Console (web UI)
@@ -16,10 +16,12 @@ services:
       MINIO_REGION: us-east-1
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
-      interval: 30s
-      timeout: 20s
-      retries: 3
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live'] # Check if Minio is healthy
+      interval: 30s # Check every 30 seconds
+      timeout: 20s # Allow 20 seconds for response
+      retries: 3 # Retry 3 times before marking unhealthy
+
+
   # nest-starter-api:
   #   build:
   #     dockerfile: docker/development/Dockerfile

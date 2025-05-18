@@ -5,6 +5,7 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { TCustomRequest } from '@/modules/app/auth';
 import { DATE_TIME, IDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, LOGGER } from '@/modules/common/logger';
@@ -37,19 +38,15 @@ export class HttpLoggingInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest<TCustomRequest>();
     const { method, url, ip } = req;
     const userAgent = req.headers['user-agent'] || '';
-    const correlationId =
-      (req.headers['x-correlation-id'] as string) ||
-      this._generateCorrelationId();
+
     const loggerContext = {
       name: 'HttpLoggingInterceptor',
       method: 'intercept',
     };
 
-    req.correlationId = correlationId;
-
     const startTime = this._dateTime.timestamp;
     this._logger.info(
-      `[${correlationId}] ${method} ${url} - IP: ${ip} - UserAgent: ${userAgent}`,
+      `${method} ${url} - IP: ${ip} - UserAgent: ${userAgent}`,
       {
         context: loggerContext,
       }
@@ -57,33 +54,24 @@ export class HttpLoggingInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap({
-        next: () => {
+        next: (response: Response) => {
           const endTime = this._dateTime.timestamp;
+          const responseSize = JSON.stringify(response).length;
+
           this._logger.info(
-            `[${correlationId}] ${method} ${url} - ${endTime - startTime}ms - Success`,
+            `${method} ${url} - ${endTime - startTime}ms - Success - Size: ${responseSize} bytes`,
             { context: loggerContext }
           );
+          return response;
         },
         error: (error: Error) => {
           const endTime = this._dateTime.timestamp;
           this._logger.error(
-            `[${correlationId}] ${method} ${url} - ${endTime - startTime}ms - Error: ${error?.message}`,
+            `${method} ${url} - ${endTime - startTime}ms - Error: ${error?.message}`,
             { context: loggerContext, stack: error?.stack }
           );
         },
       })
-    );
-  }
-
-  /**
-   * Generates a correlation ID
-   *
-   * @returns {string} - Generated correlation ID
-   */
-  private _generateCorrelationId(): string {
-    return (
-      this._dateTime.timestamp.toString(36) +
-      Math.random().toString(36).substring(2)
     );
   }
 }

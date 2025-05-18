@@ -1,6 +1,7 @@
 import { Role } from '@/enums';
 
 export const APP_NAME = 'LearnFlow';
+export const CORRELATION_ID = 'correlationId';
 
 export const PAGINATION = {
   DEFAULT_PAGINATION_PAGE: 1,

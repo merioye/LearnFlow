@@ -39,6 +39,7 @@ export const configOptions: ConfigModuleOptions = {
   envFilePath: join(__dirname, `../../.env.${process.env[Config.NODE_ENV]}`),
   validationSchema: Joi.object({
     PORT: Joi.number().required(),
+    APP_DOMAIN: Joi.string().required(),
     NODE_ENV: Joi.string().valid(DEV, TEST, PROD).required(),
     API_PREFIX: Joi.string().required(),
     API_DEFAULT_VERSION: Joi.string().required(),
@@ -85,7 +86,7 @@ export const configOptions: ConfigModuleOptions = {
     JWT_ISSUER: Joi.string().required(),
     JWT_AUDIENCE: Joi.string().required(),
     ALLOWED_ORIGINS: Joi.string().required(),
-    BEHIND_PROXY: Joi.string().required(),
+    BEHIND_PROXY: Joi.boolean().required(),
     THROTTLE_TTL: Joi.number().required(),
     THROTTLE_LIMIT: Joi.number().required(),
   }),

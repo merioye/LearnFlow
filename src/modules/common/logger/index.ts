@@ -3,3 +3,4 @@ export * from './loggers';
 export { LOGGER } from './constants';
 export { ILogger } from './interfaces';
 export * from './types';
+export * from './decorators';

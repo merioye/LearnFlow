@@ -1,0 +1,1 @@
+export const METRIC_COLLECTOR = Symbol('METRIC_COLLECTOR');

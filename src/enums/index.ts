@@ -12,6 +12,7 @@ export enum Environment {
  */
 export enum Config {
   PORT = 'PORT',
+  APP_DOMAIN = 'APP_DOMAIN',
   NODE_ENV = 'NODE_ENV',
   API_PREFIX = 'API_PREFIX',
   API_DEFAULT_VERSION = 'API_DEFAULT_VERSION',

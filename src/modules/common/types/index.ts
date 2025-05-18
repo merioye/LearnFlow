@@ -17,6 +17,7 @@ type TCommonAppModuleOptions = {
   cache?: TCacheModuleOptions;
   cronJob?: TCronJobModuleOptions;
   elasticSearch?: TElasticsearchModuleAsyncOptions;
+  enableMetrics?: boolean;
 };
 
 export { TCommonAppModuleOptions };

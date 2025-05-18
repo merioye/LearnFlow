@@ -5,6 +5,7 @@ import { CronJobModule } from './cron-job';
 import { ElasticsearchModule } from './elasticsearch';
 import { HelperModule } from './helper';
 import { LoggerModule } from './logger';
+import { MetricsModule } from './metrics';
 import { TCommonAppModuleOptions } from './types';
 
 /**
@@ -26,6 +27,7 @@ export class CommonAppModule {
     cache,
     cronJob,
     elasticSearch,
+    enableMetrics,
   }: TCommonAppModuleOptions): DynamicModule {
     return {
       module: CommonAppModule,
@@ -37,6 +39,7 @@ export class CommonAppModule {
         ...(elasticSearch
           ? [ElasticsearchModule.registerAsync(elasticSearch)]
           : []),
+        ...(enableMetrics ? [MetricsModule] : []),
       ],
     };
   }

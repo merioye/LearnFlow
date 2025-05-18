@@ -15,3 +15,12 @@ export type TLoggerModuleOptions = {
   debugMode: boolean;
   appName: string;
 };
+
+export type TLogInfo = {
+  timestamp: string;
+  level: string;
+  message: string;
+  correlation_id?: string;
+  stack?: string;
+  metadata?: Record<string, any>;
+};

@@ -1,4 +1,4 @@
-import { TElasticSearchHealth } from '@/modules/common/elasticsearch';
+// import { TElasticSearchHealth } from '@/modules/common/elasticsearch';
 
 import { TDatabaseHealth } from '@/database';
 
@@ -8,7 +8,7 @@ export type THealth = {
     status: string;
   };
   database: TDatabaseHealth;
-  elasticSearch: TElasticSearchHealth;
+  // elasticSearch: TElasticSearchHealth;
 };
 
 export type TPongItem = {
@@ -18,5 +18,5 @@ export type TPongItem = {
 
 export type TPong = {
   database: TPongItem;
-  elasticSearch: TPongItem;
+  // elasticSearch: TPongItem;
 };

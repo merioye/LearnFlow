@@ -1,4 +1,9 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { GracefulShutdownModule } from 'nestjs-graceful-shutdown';
@@ -14,12 +19,15 @@ import {
 import { AllExceptionsFilter } from './core/filters';
 import { ExceptionHandlingStrategyFactory } from './core/filters/factories';
 import { HttpLoggingInterceptor } from './core/interceptors';
+import { CorrelationIdMiddleware } from './core/middlewares';
 import { DatabaseModule } from './database';
 import { Config } from './enums';
 import { ApplicationModule } from './modules/app';
 import { CommonAppModule } from './modules/common';
 import { CACHE_SERVICE, ICacheService } from './modules/common/cache';
 import { ILogger, LOGGER } from './modules/common/logger';
+
+// import { MetricsInterceptor } from './modules/common/metrics';
 
 /**
  * The application module
@@ -36,12 +44,19 @@ import { ILogger, LOGGER } from './modules/common/logger';
     ConfigModule.forRoot(configOptions),
     DatabaseModule,
     GracefulShutdownModule.forRootAsync({
-      inject: [ConfigService, LOGGER, CACHE_SERVICE, DataSource],
+      inject: [
+        ConfigService,
+        LOGGER,
+        CACHE_SERVICE,
+        DataSource,
+        // ElasticsearchService,
+      ],
       useFactory: (
         configService: ConfigService,
         logger: ILogger,
         cacheService: ICacheService,
         dataSource: DataSource
+        // esService: ElasticsearchService
       ) => ({
         gracefulShutdownTimeout: configService.get<number>(
           Config.GRACEFUL_SHUTDOWN_TIMEOUT
@@ -50,6 +65,10 @@ import { ILogger, LOGGER } from './modules/common/logger';
           logger.info('Closing database connection...');
           await dataSource.destroy();
           logger.info('Database connection closed.');
+
+          // logger.info('Closing elasticsearch connection...');
+          // await esService.close();
+          // logger.info('Closed elasticsearch connection...');
 
           logger.info('Closing API Cache connection...');
           await cacheService.disconnect();
@@ -61,11 +80,13 @@ import { ILogger, LOGGER } from './modules/common/logger';
       logger: loggerModuleOptions,
       cache: cacheModuleOptions,
       cronJob: cronJobModuleOptions,
+      enableMetrics: true,
     }),
     ApplicationModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: HttpLoggingInterceptor },
+    // { provide: APP_INTERCEPTOR, useClass: MetricsInterceptor },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     {
       provide: APP_PIPE,
@@ -78,4 +99,9 @@ import { ILogger, LOGGER } from './modules/common/logger';
     ExceptionHandlingStrategyFactory,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer): void {
+    // Apply correlation ID middleware to all routes
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  }
+}

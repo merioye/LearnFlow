@@ -5,3 +5,5 @@ export * from './services';
 export * from './schedulers';
 export * from './types';
 export * from './cron-job.module';
+export * from './decorators';
+export * from './tasks';

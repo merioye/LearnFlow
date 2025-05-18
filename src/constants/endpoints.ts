@@ -5,6 +5,9 @@ export const ENDPOINTS = {
       Ping: '/ping',
     },
   },
+  Metrics: {
+    Base: '/metrics',
+  },
   Auth: {
     Post: {
       Login: '/auth/login',
