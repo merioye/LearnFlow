@@ -2,21 +2,32 @@ import path from 'path';
 import { Injectable } from '@nestjs/common';
 import callsites from 'callsites';
 import * as cls from 'cls-hooked';
-import { createLogger, format, Logger, transports } from 'winston';
+import {
+  createLogger,
+  format,
+  Logger,
+  LoggerOptions,
+  transports,
+} from 'winston';
+import LokiTransport from 'winston-loki';
 
 import { Environment } from '@/enums';
 import { CORRELATION_ID } from '@/constants';
 
 import { ILogger } from '../interfaces';
-import { TLogCaller, TLoggerModuleOptions, TLogInfo } from '../types';
+import {
+  TLogCaller,
+  TLoggerModuleOptions,
+  TLogInfo,
+  TLokiConfig,
+} from '../types';
 
 // Create a namespace for storing correlation ID in AsyncLocalStorage
 export const LoggerContextNamespace = cls.createNamespace('logger-context');
 
 /**
  * Singleton of Logger using Winston library which implements the ILogger interface
- * Optimized for Filebeat/Fluentd collection and Elasticsearch storage
- * Enhanced with automatic caller context detection
+ * Enhanced with automatic caller context detection and Grafana Loki integration
  *
  * @class WinstonLogger
  * @implements {ILogger}
@@ -47,6 +58,7 @@ export class WinstonLogger implements ILogger {
     debugMode,
     appName,
     rootDir = process.cwd(),
+    loki,
   }: TLoggerModuleOptions) {
     const isTestingEnvironment = environment === Environment.TEST;
     const logLevel = debugMode ? 'debug' : 'info';
@@ -87,29 +99,45 @@ export class WinstonLogger implements ILogger {
       format.colorize({ all: true })
     );
 
+    // Define the transports array
+    const logTransports: LoggerOptions['transports'] = [
+      new transports.Console({
+        level: logLevel,
+        silent: isTestingEnvironment,
+        format: debugMode ? consoleFormat : commonFormat,
+      }),
+      new transports.File({
+        level: 'error',
+        dirname: logsDirPath,
+        filename: 'error.log',
+        silent: isTestingEnvironment,
+        format: commonFormat,
+      }),
+      new transports.File({
+        level: logLevel,
+        dirname: logsDirPath,
+        filename: 'combined.log',
+        silent: isTestingEnvironment,
+        format: commonFormat,
+      }),
+    ];
+
+    // Add Loki transport if configuration is provided
+    if (loki?.host) {
+      logTransports.push(
+        this._createLokiTransport(
+          loki,
+          appName,
+          environment,
+          logLevel,
+          isTestingEnvironment
+        )
+      );
+    }
+
     this._logger = createLogger({
       level: logLevel,
-      transports: [
-        new transports.Console({
-          level: logLevel,
-          silent: isTestingEnvironment,
-          format: debugMode ? consoleFormat : commonFormat,
-        }),
-        new transports.File({
-          level: 'error',
-          dirname: logsDirPath,
-          filename: 'error.log',
-          silent: isTestingEnvironment,
-          format: commonFormat,
-        }),
-        new transports.File({
-          level: logLevel,
-          dirname: logsDirPath,
-          filename: 'combined.log',
-          silent: isTestingEnvironment,
-          format: commonFormat,
-        }),
-      ],
+      transports: logTransports,
     });
   }
 
@@ -282,5 +310,54 @@ export class WinstonLogger implements ILogger {
       // Fallback if we can't get caller info
       return null;
     }
+  }
+
+  /**
+   * Creates a properly configured Loki transport for Winston
+   *
+   * @param lokiConfig - Loki configuration options
+   * @param appName - Application name for default labels
+   * @param environment - Current environment for default labels
+   * @param logLevel - Configured log level
+   * @param isSilent - Whether to silence the transport (e.g. in test environment)
+   * @returns Configured Loki transport
+   *
+   * @private
+   */
+  private _createLokiTransport(
+    lokiConfig: TLokiConfig,
+    appName: string,
+    environment: Environment,
+    logLevel: string,
+    isSilent: boolean
+  ): LokiTransport {
+    // Define default labels
+    const defaultLabels = {
+      service: appName,
+      environment,
+      ...lokiConfig.labels,
+    };
+
+    return new LokiTransport({
+      host: lokiConfig.host,
+      basicAuth: lokiConfig.basicAuth,
+      labels: defaultLabels,
+      json: true,
+      batching: lokiConfig.batching ?? true,
+      interval: lokiConfig.interval ?? 5,
+      gracefulShutdown: lokiConfig.gracefulShutdown ?? true,
+      clearOnError: lokiConfig.clearOnError ?? false,
+      replaceTimestamp: lokiConfig.replaceTimestamp ?? true,
+      format: format.combine(format.timestamp(), format.json()),
+      level: logLevel,
+      silent: isSilent,
+      // Automatically retry on connection failures (production grade)
+      timeout: lokiConfig.timeout ?? 30000,
+      onConnectionError: (err): void => {
+        // Log to console if Loki connection fails to prevent logging loop
+        // eslint-disable-next-line no-console
+        console.error(`Loki connection error: ${(err as Error)?.message}`);
+      },
+    });
   }
 }

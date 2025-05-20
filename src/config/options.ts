@@ -28,6 +28,16 @@ export const loggerModuleOptions: TLoggerModuleOptions = {
   logsDirPath: resolve(process.cwd(), 'logs'),
   debugMode: process.env[Config.DEBUG_MODE] == 'true',
   appName: APP_NAME,
+  // loki: {
+  //   host: process.env[Config.LOKI_HOST]!,
+  //   basicAuth: process.env[Config.LOKI_AUTH],
+  //   // Production-optimized settings
+  //   batching: true,
+  //   interval: process.env[Config.NODE_ENV] === Environment.PROD ? 5 : 1,
+  //   gracefulShutdown: true,
+  //   clearOnError: false,
+  //   timeout: 30000,
+  // },
 };
 export const logger = WinstonLogger.getInstance(loggerModuleOptions);
 
@@ -89,6 +99,8 @@ export const configOptions: ConfigModuleOptions = {
     BEHIND_PROXY: Joi.boolean().required(),
     THROTTLE_TTL: Joi.number().required(),
     THROTTLE_LIMIT: Joi.number().required(),
+    LOKI_HOST: Joi.string().required(),
+    LOKI_AUTH: Joi.string().required(),
   }),
   validationOptions: {
     abortEarly: true,

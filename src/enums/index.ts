@@ -62,6 +62,8 @@ export enum Config {
   BEHIND_PROXY = 'BEHIND_PROXY',
   THROTTLE_TTL = 'THROTTLE_TTL',
   THROTTLE_LIMIT = 'THROTTLE_LIMIT',
+  LOKI_HOST = 'LOKI_HOST',
+  LOKI_AUTH = 'LOKI_AUTH',
 }
 
 export enum RedisDB {
