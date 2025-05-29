@@ -1,19 +1,24 @@
 export const ENDPOINTS = {
   Health: {
+    Base: 'health',
     Get: {
       HealthCheck: '/healthcheck',
       Ping: '/ping',
     },
   },
+  Csrf: {
+    Base: 'csrf',
+    Get: {
+      Token: '/token',
+    },
+  },
   Metrics: {
-    Base: '/metrics',
+    Base: 'metrics',
   },
   Auth: {
-    Base: '/auth',
+    Base: 'auth',
     Post: {
       Login: '/login',
     },
   },
 } as const;
-
-export const PUBLIC_ENDPOINTS = [ENDPOINTS.Auth.Post.Login] as const;

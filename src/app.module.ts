@@ -5,7 +5,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { GracefulShutdownModule } from 'nestjs-graceful-shutdown';
 import { DataSource } from 'typeorm';
 
@@ -23,6 +23,11 @@ import { CorrelationIdMiddleware } from './core/middlewares';
 import { DatabaseModule } from './database';
 import { Config } from './enums';
 import { ApplicationModule } from './modules/app';
+import { CsrfGuard } from './modules/app/auth/security/csrf';
+import {
+  CustomThrottlerGuard,
+  ThrottlerRedisService,
+} from './modules/app/auth/security/throttler';
 import { CommonAppModule } from './modules/common';
 import { CACHE_SERVICE, ICacheService } from './modules/common/cache';
 import { ILogger, LOGGER } from './modules/common/logger';
@@ -39,7 +44,6 @@ import { MetricsInterceptor } from './modules/common/metrics';
  */
 @Module({
   imports: [
-    // ThrottlerModule.forRootAsync(throttlerModuleOptions),
     ConfigModule.forRoot(configOptions),
     DatabaseModule,
     GracefulShutdownModule.forRootAsync({
@@ -48,13 +52,15 @@ import { MetricsInterceptor } from './modules/common/metrics';
         LOGGER,
         CACHE_SERVICE,
         DataSource,
+        ThrottlerRedisService,
         // ElasticsearchService,
       ],
       useFactory: (
         configService: ConfigService,
         logger: ILogger,
         cacheService: ICacheService,
-        dataSource: DataSource
+        dataSource: DataSource,
+        throttlerRedisService: ThrottlerRedisService
         // esService: ElasticsearchService
       ) => ({
         gracefulShutdownTimeout: configService.get<number>(
@@ -72,6 +78,10 @@ import { MetricsInterceptor } from './modules/common/metrics';
           logger.info('Closing API Cache connection...');
           await cacheService.disconnect();
           logger.info('API Cache connection closed.');
+
+          logger.info('Closing Throttler Redis connection...');
+          await throttlerRedisService.disconnect();
+          logger.info('Throttler Redis connection closed.');
         },
       }),
     }),
@@ -91,10 +101,14 @@ import { MetricsInterceptor } from './modules/common/metrics';
       provide: APP_PIPE,
       useValue: new ValidationPipe(validationPipeOptions),
     },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: ThrottlerGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: CustomThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: CsrfGuard,
+    },
     ExceptionHandlingStrategyFactory,
   ],
 })

@@ -11,7 +11,7 @@ import { THealth, TPong } from './types';
  *
  * @class HealthController
  */
-@Controller()
+@Controller(ENDPOINTS.Health.Base)
 export class HealthController {
   /**
    * Creates a new HealthController instance.

@@ -32,24 +32,11 @@ export class RedisCacheService
     this._client = new Redis({
       ...cacheOptions,
       db: RedisDB.API_CACHE, // Using api cache db
+      // keyPrefix: 'api_cache:',
     });
 
-    // Error handling
-    this._client.on('error', (error: Error) =>
-      this._logger.error('API Cache Client Error', { error })
-    );
-    this._client.on('connect', () =>
-      this._logger.info('API Cache Client Connected 🚀')
-    );
-    this._client.on('ready', () =>
-      this._logger.info('API Cache Client Ready for commands')
-    );
-    this._client.on('reconnecting', () =>
-      this._logger.warn('API Cache Client Reconnecting...')
-    );
-    this._client.on('close', () =>
-      this._logger.warn('API Cache Client Connection closed')
-    );
+    // Set up event handlers
+    this._setupEventHandlers();
   }
 
   /**
@@ -190,5 +177,27 @@ export class RedisCacheService
     );
 
     return `cache:${controller}:${handler}:${paramsHash}:${queryHash}${suffix ? `:${suffix}` : ''}`;
+  }
+
+  /**
+   * Set up Redis event handlers for connection monitoring
+   * @returns {void}
+   */
+  private _setupEventHandlers(): void {
+    this._client.on('error', (error: Error) =>
+      this._logger.error('API Cache Client Error', { error })
+    );
+    this._client.on('connect', () =>
+      this._logger.info('API Cache Client Connected 🚀')
+    );
+    this._client.on('ready', () =>
+      this._logger.info('API Cache Client Ready for commands')
+    );
+    this._client.on('reconnecting', () =>
+      this._logger.warn('API Cache Client Reconnecting...')
+    );
+    this._client.on('close', () =>
+      this._logger.warn('API Cache Client Connection closed')
+    );
   }
 }

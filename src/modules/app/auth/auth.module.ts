@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { UsersMetrics } from './metrics';
+import { SecurityModule } from './security';
 import { AuthService } from './services';
 
 /**
@@ -11,6 +12,7 @@ import { AuthService } from './services';
  * @module AuthModule
  */
 @Module({
+  imports: [SecurityModule],
   providers: [UsersMetrics, AuthService],
   exports: [],
 })

@@ -1,19 +1,88 @@
 services:
-  contentora-api:
-    build:
-      dockerfile: docker/production/Dockerfile
-      context: .
-    image: contentora-api:prod
-    container_name: contentora-api-prod-con
-    restart: always
-    ports:
-      - '8000:8000'
+  # Grafana Alloy for metrics collection
+  alloy:
+    image: grafana/alloy:latest
+    container_name: grafana-alloy-prod
+    restart: unless-stopped
+    networks:
+      - monitoring
+    volumes:
+      - ./monitoring/alloy-prod.alloy:/etc/alloy/config.alloy:ro
+      - alloy_data:/var/lib/alloy
+      - /var/run/docker.sock:/var/run/docker.sock:ro # For Docker service discovery
+    environment:
+      - ALLOY_LOG_LEVEL=warn # Less verbose in production
+      - ALLOY_METRICS_ADDR=0.0.0.0:12345
     env_file:
-      - ./.env.production
+      - .env.docker
+    command:
+      - run
+      - --storage.path=/var/lib/alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --stability.level=generally-available
+      - /etc/alloy/config.alloy # Configuration file path as positional argument
+    depends_on:
+      contentora-api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--quiet',
+          '--tries=1',
+          '--spider',
+          'http://localhost:12345/-/healthy',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    # Resource limits for production
     deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-      update_config:
-        parallelism: 2
-        delay: 15s
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    labels:
+      - 'com.docker.compose.project=alloy-prod'
+      - 'description=Grafana Alloy for Production'
+  # contentora-api:
+  #   build:
+  #     dockerfile: docker/production/Dockerfile
+  #     context: .
+  #   image: contentora-api:prod
+  #   container_name: contentora-api-prod-con
+  #   restart: always
+  #   ports:
+  #     - '8000:8000'
+  #   networks:
+  #     - app_network
+  #     - monitoring
+  #   env_file:
+  #     - ./.env.production
+  #   deploy:
+  #     replicas: 1
+  #     restart_policy:
+  #       condition: any
+  #     update_config:
+  #       parallelism: 2
+  #       delay: 15s
+
+networks:
+  monitoring:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  app_network:
+    driver: bridge
+
+volumes:
+  alloy_data:
+    driver: local

@@ -1,6 +1,8 @@
 import { Request } from 'express';
 
-import { Role } from '@/enums';
+import { Config, Role } from '@/enums';
+
+import { JwtToken } from '../enums';
 
 /**
  * Type for access token payload
@@ -34,7 +36,14 @@ export type TAuthRequestUser = {
   permissions: string[];
 };
 
+export type TCookies = {
+  [JwtToken.ACCESS]?: string;
+  [JwtToken.REFRESH]?: string;
+  [Config.CSRF_COOKIE_NAME]?: string;
+};
+
 export type TCustomRequest = Request & {
   correlationId: string;
   user: TAuthRequestUser;
+  cookies: TCookies;
 };

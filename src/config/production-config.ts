@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 // Production security configurations for NestJS application
 
 import { ConfigService } from '@nestjs/config';
@@ -20,15 +21,15 @@ export function setupProductionApp(
     helmet({
       contentSecurityPolicy: {
         directives: {
-          defaultSrc: ['self'],
-          scriptSrc: ['self', 'unsafe-inline', 'unsafe-eval'],
-          styleSrc: ['self', 'unsafe-inline'],
-          imgSrc: ['self', 'data:'],
-          connectSrc: ['self'],
-          fontSrc: ['self'],
-          objectSrc: ['none'],
-          mediaSrc: ['self'],
-          frameSrc: ['none'],
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:'],
+          connectSrc: ["'self'"],
+          fontSrc: ["'self'"],
+          objectSrc: ["'none'"],
+          mediaSrc: ["'self'"],
+          frameSrc: ["'none'"],
         },
       },
       crossOriginEmbedderPolicy: false,

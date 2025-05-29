@@ -1,0 +1,118 @@
+// Logging configuration
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+// Scrape metrics from your application running on host
+prometheus.scrape "contentora_dev" {
+  targets = [
+    {
+      "__address__"      = "host.docker.internal:5001",  // Use host.docker.internal for Docker Desktop
+      "__metrics_path__" = "/api/v1/metrics",
+      "job"             = "contentora-dev",
+      "environment"     = "development",
+      "instance"        = "localhost:5001",
+    },
+  ]
+
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  scrape_interval = "15s"
+  scrape_timeout  = "10s"
+
+  // Add custom labels
+  params = {
+    "format" = ["prometheus"],
+  }
+}
+
+// Alternative scrape for Linux hosts (use 172.17.0.1 instead of host.docker.internal)
+prometheus.scrape "contentora_dev_linux" {
+  targets = [
+    {
+      "__address__"      = "172.17.0.1:5001",  // Docker bridge IP on Linux
+      "__metrics_path__" = "/api/v1/metrics",
+      "job"             = "contentora-dev",
+      "environment"     = "development",
+      "instance"        = "localhost:5001",
+    },
+  ]
+
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  scrape_interval = "15s"
+  scrape_timeout  = "10s"
+}
+
+// Self-monitoring: scrape Alloy's own metrics
+prometheus.scrape "alloy_self" {
+  targets = [
+    {
+      "__address__" = "localhost:12345",
+      "job"         = "alloy",
+      "instance"    = "alloy-dev",
+    },
+  ]
+
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  scrape_interval = "30s"
+  metrics_path    = "/metrics"
+}
+
+// Remote write to Grafana Cloud
+prometheus.remote_write "grafana_cloud" {
+  endpoint {
+    url = env("PROMETHEUS_URL")  // Set via environment variable
+
+    basic_auth {
+      username = env("PROMETHEUS_USERNAME")
+      password = env("PROMETHEUS_PASSWORD")
+    }
+
+    // Retry configuration
+    queue_config {
+      capacity             = 10000
+      max_samples_per_send = 2000
+      batch_send_deadline  = "5s"
+    }
+
+    // Enable metadata sending
+    metadata_config {
+      send         = true
+      send_interval = "1m"
+    }
+  }
+
+  // WAL configuration for reliability
+  wal {
+    truncate_frequency = "2h"
+    min_keepalive_time = "5m"
+    max_keepalive_time = "8h"
+  }
+}
+
+// Discovery for additional services (optional)
+discovery.docker "local_containers" {
+  host = "unix:///var/run/docker.sock"
+
+  filter {
+    name   = "label"
+    values = ["monitoring.scrape=true"]
+  }
+}
+
+// Debug endpoint configuration
+prometheus.exporter.unix "system_metrics" {
+  // Enable system metrics collection
+}
+
+// Forward system metrics
+prometheus.scrape "system" {
+  targets    = prometheus.exporter.unix.system_metrics.targets
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  scrape_interval = "30s"
+  job_name        = "system-dev"
+}

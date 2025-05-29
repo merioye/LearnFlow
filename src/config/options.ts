@@ -28,16 +28,19 @@ export const loggerModuleOptions: TLoggerModuleOptions = {
   logsDirPath: resolve(process.cwd(), 'logs'),
   debugMode: process.env[Config.DEBUG_MODE] == 'true',
   appName: APP_NAME,
-  // loki: {
-  //   host: process.env[Config.LOKI_HOST]!,
-  //   basicAuth: process.env[Config.LOKI_AUTH],
-  //   // Production-optimized settings
-  //   batching: true,
-  //   interval: process.env[Config.NODE_ENV] === Environment.PROD ? 5 : 1,
-  //   gracefulShutdown: true,
-  //   clearOnError: false,
-  //   timeout: 30000,
-  // },
+  loki: {
+    host: process.env[Config.LOKI_URL]!,
+    basicAuth:
+      process.env[Config.LOKI_USERNAME] +
+      ':' +
+      process.env[Config.LOKI_PASSWORD],
+    // Production-optimized settings
+    batching: true,
+    interval: process.env[Config.NODE_ENV] === Environment.PROD ? 5 : 1,
+    gracefulShutdown: true,
+    clearOnError: false,
+    timeout: 30000,
+  },
 };
 export const logger = WinstonLogger.getInstance(loggerModuleOptions);
 
@@ -99,27 +102,17 @@ export const configOptions: ConfigModuleOptions = {
     BEHIND_PROXY: Joi.boolean().required(),
     THROTTLE_TTL: Joi.number().required(),
     THROTTLE_LIMIT: Joi.number().required(),
-    LOKI_HOST: Joi.string().required(),
-    LOKI_AUTH: Joi.string().required(),
+    LOKI_URL: Joi.string().uri().required(),
+    LOKI_USERNAME: Joi.string().required(),
+    LOKI_PASSWORD: Joi.string().required(),
+    PROMETHEUS_URL: Joi.string().uri().required(),
+    PROMETHEUS_USERNAME: Joi.string().required(),
+    PROMETHEUS_PASSWORD: Joi.string().required(),
   }),
   validationOptions: {
     abortEarly: true,
   },
 };
-
-// export const throttlerModuleOptions: ThrottlerAsyncOptions = {
-//   inject: [ConfigService],
-//   useFactory: (configService: ConfigService) => ({
-//     throttlers: [
-//       {
-//         ttl: configService.get<number>(Config.THROTTLE_TTL)!, // Time window in seconds
-//         limit: configService.get<number>(Config.THROTTLE_LIMIT)!, // Max requests per IP in the time window
-//       },
-//     ],
-//     storage: new ThrottlerStorageRedisService(),
-//     // configService.get(Config.CACHE_URL)
-//   }),
-// };
 
 /**
  * ValidationPipe options
@@ -166,6 +159,7 @@ export const cacheOptions: RedisOptions = {
   // Connection configuration
   connectTimeout: 10000, // 10 seconds
   maxRetriesPerRequest: 3,
+  family: 4,
   retryStrategy: (times) => {
     const delay = Math.min(times * 200, 3000); // Exponential backoff with 3s max
     logger.debug(
@@ -173,7 +167,6 @@ export const cacheOptions: RedisOptions = {
     );
     return delay;
   },
-
   // Command execution timeout
   commandTimeout: 5000, // 5 seconds
 

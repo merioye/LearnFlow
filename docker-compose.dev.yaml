@@ -20,7 +20,46 @@ services:
       interval: 30s # Check every 30 seconds
       timeout: 20s # Allow 20 seconds for response
       retries: 3 # Retry 3 times before marking unhealthy
-
+  # Grafana Alloy for metrics collection
+  alloy:
+    image: grafana/alloy:latest
+    container_name: grafana-alloy-dev
+    restart: unless-stopped
+    # Use host networking to easily access localhost applications
+    network_mode: host
+    volumes:
+      - ./monitoring/alloy-dev.alloy:/etc/alloy/config.alloy:ro
+      - alloy_data:/var/lib/alloy
+      - /var/log:/var/log:ro # Optional: for log collection
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Docker socket access
+    environment:
+      - ALLOY_LOG_LEVEL=info
+      - ALLOY_METRICS_ADDR=0.0.0.0:12345
+    env_file:
+      - .env.docker
+    command:
+      - run
+      - --storage.path=/var/lib/alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --stability.level=generally-available
+      - /etc/alloy/config.alloy # Configuration file path as positional argument
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--quiet',
+          '--tries=1',
+          '--spider',
+          'http://localhost:12345/-/healthy',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - 'com.docker.compose.project=alloy-dev'
+      - 'description=Grafana Alloy for Development'
 
   # nest-starter-api:
   #   build:
@@ -36,3 +75,7 @@ services:
   #   volumes:
   #     - .:/workspace
   #     - /workspace/node_modules
+
+volumes:
+  alloy_data:
+    driver: local

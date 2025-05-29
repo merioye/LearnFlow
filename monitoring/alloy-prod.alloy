@@ -1,0 +1,174 @@
+// Logging configuration - less verbose for production
+logging {
+  level  = "warn"
+  format = "json"
+}
+
+// Docker service discovery
+discovery.docker "app_containers" {
+  host = "unix:///var/run/docker.sock"
+
+  filter {
+    name   = "label"
+    values = ["monitoring.scrape=true"]
+  }
+}
+
+// Scrape metrics from discovered Docker containers
+prometheus.scrape "discovered_apps" {
+  targets = discovery.docker.app_containers.targets
+
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  scrape_interval = "30s"
+  scrape_timeout  = "25s"
+
+  // Relabeling rules
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    target_label  = "container_name"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_monitoring_port"]
+    target_label  = "__address__"
+    replacement   = "${1}"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_monitoring_path"]
+    target_label  = "__metrics_path__"
+  }
+
+  rule {
+    target_label = "environment"
+    replacement  = "production"
+  }
+}
+
+// Direct scrape for your specific application (fallback)
+prometheus.scrape "contentora_prod" {
+  targets = [
+    {
+      "__address__"      = "contentora:5001",  // Use Docker service name
+      "__metrics_path__" = "/api/v1/metrics",
+      "job"             = "contentora-prod",
+      "environment"     = "production",
+      "service"         = "contentora",
+    },
+  ]
+
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  scrape_interval = "30s"
+  scrape_timeout  = "25s"
+
+  // Health check before scraping
+  honor_labels = false
+}
+
+// Scrape Alloy's own metrics (self-monitoring)
+prometheus.scrape "alloy_self" {
+  targets = [
+    {
+      "__address__" = "localhost:12345",
+      "job"         = "alloy",
+      "instance"    = "alloy-prod",
+      "environment" = "production",
+    },
+  ]
+
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  scrape_interval = "60s"  // Less frequent in production
+  metrics_path    = "/metrics"
+}
+
+// Remote write to Grafana Cloud with production settings
+prometheus.remote_write "grafana_cloud" {
+  endpoint {
+    url = env("PROMETHEUS_URL")
+
+    basic_auth {
+      username = env("PROMETHEUS_USERNAME")
+      password = env("PROMETHEUS_PASSWORD")
+    }
+
+    // Production queue configuration
+    queue_config {
+      capacity             = 50000
+      max_samples_per_send = 5000
+      batch_send_deadline  = "10s"
+      min_backoff          = "30ms"
+      max_backoff          = "5s"
+      retry_on_http_429    = true
+    }
+
+    // Metadata configuration
+    metadata_config {
+      send         = true
+      send_interval = "5m"
+      max_samples_per_send = 2000
+    }
+
+    // Write relabel configs for production
+    write_relabel_config {
+      source_labels = ["__name__"]
+      regex         = "go_.*"
+      action        = "drop"  // Drop Go runtime metrics to reduce cardinality
+    }
+
+    write_relabel_config {
+      source_labels = ["__name__"]
+      regex         = "promhttp_.*"
+      action        = "drop"  // Drop Prometheus HTTP metrics
+    }
+  }
+
+  // WAL configuration for production reliability
+  wal {
+    truncate_frequency = "1h"
+    min_keepalive_time = "10m"
+    max_keepalive_time = "4h"
+  }
+
+  // External labels for multi-environment setups
+  external_labels = {
+    cluster     = "production"
+    region      = env("AWS_REGION")
+    environment = "prod"
+  }
+}
+
+// System metrics collection (optional but recommended)
+prometheus.exporter.unix "system_metrics" {
+  include_exporter_metrics = false
+  disable_collectors       = ["wifi", "powersupplyclass"]
+}
+
+prometheus.scrape "system" {
+  targets    = prometheus.exporter.unix.system_metrics.targets
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  scrape_interval = "60s"
+  job_name        = "system-prod"
+
+  // Add production labels
+  rule {
+    target_label = "environment"
+    replacement  = "production"
+  }
+}
+
+// Optional: Collect Docker container metrics
+prometheus.exporter.cadvisor "container_metrics" {
+  docker_host = "unix:///var/run/docker.sock"
+}
+
+prometheus.scrape "containers" {
+  targets    = prometheus.exporter.cadvisor.container_metrics.targets
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  scrape_interval = "30s"
+  job_name        = "cadvisor-prod"
+}
