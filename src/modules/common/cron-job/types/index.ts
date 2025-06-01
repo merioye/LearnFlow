@@ -81,7 +81,7 @@ export type TScheduleParams = {
 export type TCronJobTaskContext<T = any> = {
   jobName: string;
   timestamp: Date;
-  params?: T;
+  params: T;
 };
 
 /**

@@ -1,19 +1,11 @@
-import {
-  Column,
-  Entity,
-  Index,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Index, ManyToOne } from 'typeorm';
 
+import { BaseEntity } from './base';
 import { PermissionGroupEntity } from './permission-group.entity';
 import { UserEntity } from './user.entity';
 
 @Entity('tbl_permissions')
-export class PermissionEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class PermissionEntity extends BaseEntity {
   @Column()
   @Index({ unique: true })
   name: string;
@@ -31,12 +23,6 @@ export class PermissionEntity {
     { onDelete: 'CASCADE', onUpdate: 'CASCADE' }
   )
   permissionGroup: PermissionGroupEntity;
-
-  @Column({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'updated_at' })
-  updatedAt: Date;
 
   @ManyToOne(() => UserEntity, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   createdBy: UserEntity | null;

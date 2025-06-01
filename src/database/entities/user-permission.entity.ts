@@ -1,21 +1,12 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  Unique,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
 
+import { BaseEntity } from './base';
 import { PermissionEntity } from './permission.entity';
 import { UserEntity } from './user.entity';
 
 @Entity('tbl_user_permissions')
 @Unique(['userId', 'permissionId'])
-export class UserPermissionEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class UserPermissionEntity extends BaseEntity {
   @Column({ name: 'user_id' })
   userId: number;
 
@@ -35,12 +26,6 @@ export class UserPermissionEntity {
   })
   @JoinColumn({ name: 'permission_id' })
   permission: PermissionEntity;
-
-  @Column({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'updated_at' })
-  updatedAt: Date;
 
   @ManyToOne(() => UserEntity, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
   createdBy: UserEntity | null;

@@ -5,6 +5,7 @@ import { CORRELATION_ID } from '@/constants';
 import { IDateTime } from '../../helper/date-time';
 import { ILogger, LoggerContextNamespace } from '../../logger';
 import { ICronJobTask } from '../interfaces';
+import { TCronJobTaskContext } from '../types';
 
 /**
  * Base class for cron job tasks that supports correlation ID
@@ -24,11 +25,9 @@ export abstract class BaseCronJobTask implements ICronJobTask {
    * @param context - Execution context with job info and parameters
    * @returns {Promise<void>}
    */
-  public async execute(context: {
-    jobName: string;
-    timestamp: Date;
-    params: Record<string, any>;
-  }): Promise<void> {
+  public async execute(
+    context: TCronJobTaskContext<Record<string, any>>
+  ): Promise<void> {
     // Ensure we're running in the context of the correlation ID
     // This is a safety measure in case the task is called outside of the CronJobService
     const correlationId =
@@ -66,11 +65,9 @@ export abstract class BaseCronJobTask implements ICronJobTask {
    * @param context - Execution context with job info and parameters
    * @returns {Promise<void>}
    */
-  protected abstract executeTask(context: {
-    jobName: string;
-    timestamp: Date;
-    params: Record<string, any>;
-  }): Promise<void>;
+  protected abstract executeTask(
+    context: TCronJobTaskContext<Record<string, any>>
+  ): Promise<void>;
 
   /**
    * Handle errors that occur during task execution
@@ -80,11 +77,7 @@ export abstract class BaseCronJobTask implements ICronJobTask {
    */
   public async onError(
     error: Error,
-    context: {
-      jobName: string;
-      timestamp: Date;
-      params: Record<string, any>;
-    }
+    context: TCronJobTaskContext<Record<string, any>>
   ): Promise<void> {
     this.logger.error(`Error handler called for ${context.jobName}`, {
       jobName: context.jobName,
@@ -105,10 +98,6 @@ export abstract class BaseCronJobTask implements ICronJobTask {
    */
   protected handleError?(
     error: Error,
-    context: {
-      jobName: string;
-      timestamp: Date;
-      params: Record<string, any>;
-    }
+    context: TCronJobTaskContext<Record<string, any>>
   ): Promise<void>;
 }

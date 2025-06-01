@@ -1,4 +1,6 @@
 import { DatabaseError, NotFoundError } from '@/common/errors';
+import { RequestContextNamespace } from '@/core/middlewares';
+import { TCustomRequest } from '@/modules/app/auth';
 import { IDateTime } from '@/modules/common/helper/date-time';
 import {
   DataSource,
@@ -6,6 +8,7 @@ import {
   EntityManager,
   EntityMetadata,
   EntityTarget,
+  FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
   In,
@@ -19,6 +22,7 @@ import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 
 import { TCursorPaginatedResult, TOffsetPaginatedResult } from '@/types';
 import { CursorPaginateDirection, SortDirection } from '@/enums';
+import { NS_REQUEST } from '@/constants';
 
 import { SOFT_DELETION_COLUMN, VERSION_COLUMN } from '../constants';
 import { AuditOperation, LockMode } from '../enums';
@@ -96,7 +100,7 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
       /**
        * Default relations to include in queries
        */
-      defaultRelations?: string[];
+      defaultRelations?: FindOptionsRelations<T>;
 
       /**
        * Default sort order for queries
@@ -385,7 +389,7 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
     const findOptions = toFindOneOptions(params);
 
     // Include default relations if specified and not overridden
-    if (this.options.defaultRelations?.length && !findOptions.relations) {
+    if (this.options.defaultRelations && !findOptions.relations) {
       findOptions.relations = this.options.defaultRelations;
     }
 
@@ -438,6 +442,68 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
         );
       }
 
+      // Apply filter conditions
+      if (findParams.filter) {
+        this._applyWhereConditions(
+          customQueryBuilder,
+          findParams.filter,
+          alias
+        );
+      }
+
+      // Apply sorting
+      if (findParams.sort) {
+        this._applyOrderBy(customQueryBuilder, findParams.sort, alias);
+      } else if (this.options.defaultSort) {
+        // Apply default sort if no custom sort is provided
+        this._applyOrderBy(customQueryBuilder, this.options.defaultSort, alias);
+      }
+
+      // Apply field selection
+      if (findParams.select) {
+        this._applySelect(customQueryBuilder, findParams.select, alias);
+      }
+
+      // Apply relations
+      const relationsToLoad =
+        findParams.relations || this.options.defaultRelations;
+      if (relationsToLoad) {
+        this._applyRelations(customQueryBuilder, relationsToLoad, alias);
+      }
+
+      // Apply locking
+      if (findParams.lockMode) {
+        if (findParams.lockVersion) {
+          customQueryBuilder.setLock(
+            findParams.lockMode as LockMode.OPTIMISTIC,
+            findParams.lockVersion
+          );
+        } else {
+          customQueryBuilder.setLock(
+            findParams.lockMode as LockMode.PESSIMISTIC_READ
+          );
+        }
+      }
+
+      // Apply caching
+      if (findParams.cache !== undefined) {
+        if (typeof findParams.cache === 'boolean') {
+          customQueryBuilder.cache(findParams.cache);
+        } else if (typeof findParams.cache === 'number') {
+          customQueryBuilder.cache(findParams.cache);
+        } else if (typeof findParams.cache === 'object') {
+          customQueryBuilder.cache(
+            findParams.cache.id,
+            findParams.cache.milliseconds
+          );
+        }
+      }
+
+      // Apply comment
+      if (findParams.comment) {
+        customQueryBuilder.comment(findParams.comment);
+      }
+
       // Apply pagination
       if (findParams.skip !== undefined) {
         customQueryBuilder.skip(findParams.skip);
@@ -454,7 +520,7 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
     const findOptions = toFindManyOptions(findParams);
 
     // Include default relations if specified and not overridden
-    if (this.options.defaultRelations?.length && !findOptions.relations) {
+    if (this.options.defaultRelations && !findOptions.relations) {
       findOptions.relations = this.options.defaultRelations;
     }
 
@@ -570,11 +636,14 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
     };
 
     // Add deleted by if available
-    if (this.options.useAuditFields && this.options.getCurrentUserId) {
-      const userId = this.options.getCurrentUserId();
-      if (userId) {
-        updateData['deletedBy'] = { id: userId };
-      }
+    const currentUserId =
+      this._getCurrentUserIdFromNS() ?? this.options?.getCurrentUserId?.();
+    if (
+      this.options.useAuditFields &&
+      this.columnNames.includes('deletedBy') &&
+      currentUserId
+    ) {
+      updateData['deletedBy'] = { id: currentUserId };
     }
 
     await repository.update(id, updateData);
@@ -632,11 +701,14 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
     };
 
     // Add deleted by if available
-    if (this.options.useAuditFields && this.options.getCurrentUserId) {
-      const userId = this.options.getCurrentUserId();
-      if (userId) {
-        updateData['deletedBy'] = { id: userId };
-      }
+    const currentUserId =
+      this._getCurrentUserIdFromNS() ?? this.options?.getCurrentUserId?.();
+    if (
+      this.options.useAuditFields &&
+      this.columnNames.includes('deletedBy') &&
+      currentUserId
+    ) {
+      updateData['deletedBy'] = { id: currentUserId };
     }
 
     const result = await repository.update(filter, updateData);
@@ -1154,25 +1226,23 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
       result.createdAt = now;
       result.updatedAt = now;
 
-      if (this.options.getCurrentUserId) {
-        const userId = this.options.getCurrentUserId();
-        if (
-          userId &&
-          this.columnNames.includes('createdBy') &&
-          this.columnNames.includes('updatedBy')
-        ) {
-          result.createdBy = { id: userId };
-          result.updatedBy = { id: userId };
-        }
+      const currentUserId =
+        this._getCurrentUserIdFromNS() ?? this.options?.getCurrentUserId?.();
+      if (
+        currentUserId &&
+        this.columnNames.includes('createdBy') &&
+        this.columnNames.includes('updatedBy')
+      ) {
+        result.createdBy = { id: currentUserId };
+        result.updatedBy = { id: currentUserId };
       }
     } else if (operation === AuditOperation.UPDATE) {
       result.updatedAt = now;
 
-      if (this.options.getCurrentUserId) {
-        const userId = this.options.getCurrentUserId();
-        if (userId && this.columnNames.includes('updatedBy')) {
-          result.updatedBy = { id: userId };
-        }
+      const currentUserId =
+        this._getCurrentUserIdFromNS() ?? this.options?.getCurrentUserId?.();
+      if (currentUserId && this.columnNames.includes('updatedBy')) {
+        result.updatedBy = { id: currentUserId };
       }
     }
 
@@ -1211,5 +1281,177 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       filter[field] = condition;
     }
+  }
+
+  /**
+   * Gets the current user ID from the request context
+   * @returns Current user ID or null if not found
+   */
+  private _getCurrentUserIdFromNS(): number | null {
+    return (RequestContextNamespace.get(NS_REQUEST) as TCustomRequest)?.user
+      ?.userId;
+  }
+
+  // ############################## Query Builder findMany helper methods ####################################
+  /**
+   * Apply where conditions to query builder
+   * @private
+   */
+  private _applyWhereConditions(
+    queryBuilder: SelectQueryBuilder<T>,
+    filter: TTypeOrmFilterQuery<T>,
+    alias: string
+  ): void {
+    if (Array.isArray(filter)) {
+      // Handle OR conditions
+      filter.forEach((condition, index) => {
+        const whereExpression = this._buildWhereExpression(
+          condition,
+          alias,
+          `filter_${index}`
+        );
+        if (index === 0) {
+          queryBuilder.where(
+            whereExpression.condition,
+            whereExpression.parameters
+          );
+        } else {
+          queryBuilder.orWhere(
+            whereExpression.condition,
+            whereExpression.parameters
+          );
+        }
+      });
+    } else {
+      // Handle single condition
+      const whereExpression = this._buildWhereExpression(
+        filter,
+        alias,
+        'filter'
+      );
+      queryBuilder.where(whereExpression.condition, whereExpression.parameters);
+    }
+  }
+
+  /**
+   * Build where expression from filter object
+   * @private
+   */
+  private _buildWhereExpression(
+    filter: FindOptionsWhere<T>,
+    alias: string,
+    paramPrefix: string
+  ): { condition: string; parameters: Record<string, any> } {
+    const conditions: string[] = [];
+    const parameters: Record<string, any> = {};
+
+    Object.entries(filter).forEach(([key, value]) => {
+      const paramKey = `${paramPrefix}_${key}`;
+      conditions.push(`${alias}.${key} = :${paramKey}`);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      parameters[paramKey] = value;
+    });
+
+    return {
+      condition: conditions.join(' AND '),
+      parameters,
+    };
+  }
+
+  /**
+   * Apply order by to query builder
+   * @private
+   */
+  private _applyOrderBy(
+    queryBuilder: SelectQueryBuilder<T>,
+    sort: TTypeOrmSort<T>,
+    alias: string
+  ): void {
+    Object.entries(sort).forEach(([field, direction], index) => {
+      const orderField = `${alias}.${field}`;
+      if (index === 0) {
+        queryBuilder.orderBy(orderField, direction as 'ASC' | 'DESC');
+      } else {
+        queryBuilder.addOrderBy(orderField, direction as 'ASC' | 'DESC');
+      }
+    });
+  }
+
+  /**
+   * Apply select fields to query builder
+   * @private
+   */
+  private _applySelect(
+    queryBuilder: SelectQueryBuilder<T>,
+    select: FindOptionsSelect<T>,
+    alias: string
+  ): void {
+    const selectFields: string[] = [];
+
+    if (Array.isArray(select)) {
+      selectFields.push(...select.map((field) => `${alias}.${String(field)}`));
+    } else if (typeof select === 'object') {
+      Object.entries(select).forEach(([field, shouldSelect]) => {
+        if (shouldSelect) {
+          selectFields.push(`${alias}.${field}`);
+        }
+      });
+    }
+
+    if (selectFields.length > 0) {
+      queryBuilder.select(selectFields);
+    }
+  }
+
+  /**
+   * Apply relations to query builder
+   * @private
+   */
+  private _applyRelations(
+    queryBuilder: SelectQueryBuilder<T>,
+    relations: FindOptionsRelations<T>,
+    alias: string
+  ): void {
+    if (Array.isArray(relations)) {
+      relations.forEach((relation) => {
+        queryBuilder.leftJoinAndSelect(
+          `${alias}.${String(relation)}`,
+          String(relation)
+        );
+      });
+    } else if (typeof relations === 'object') {
+      this._applyNestedRelations(queryBuilder, relations, alias);
+    }
+  }
+
+  /**
+   * Apply nested relations to query builder
+   * @private
+   */
+  private _applyNestedRelations(
+    queryBuilder: SelectQueryBuilder<T>,
+    relations: FindOptionsRelations<T>,
+    parentAlias: string
+  ): void {
+    Object.entries(relations).forEach(([relationName, nestedRelations]) => {
+      const relationAlias = `${parentAlias}_${relationName}`;
+      queryBuilder.leftJoinAndSelect(
+        `${parentAlias}.${relationName}`,
+        relationAlias
+      );
+
+      // Handle nested relations recursively
+      if (
+        typeof nestedRelations === 'object' &&
+        nestedRelations !== null &&
+        nestedRelations !== true
+      ) {
+        this._applyNestedRelations(
+          queryBuilder,
+          nestedRelations as FindOptionsRelations<T>,
+          relationAlias
+        );
+      }
+    });
   }
 }

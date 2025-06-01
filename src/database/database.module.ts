@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Config } from '@/enums';
 
 import { dataSourceOptions } from './config';
-import { DatabaseHealthService } from './services';
+import { DatabaseHealthService, DistributedLockService } from './services';
 
 /**
  * The `DatabaseModule` is a global module that provides and exports the `DatabaseHealthService`.
@@ -33,7 +33,7 @@ import { DatabaseHealthService } from './services';
       },
     }),
   ],
-  providers: [DatabaseHealthService],
-  exports: [DatabaseHealthService],
+  providers: [DatabaseHealthService, DistributedLockService],
+  exports: [DatabaseHealthService, DistributedLockService],
 })
 export class DatabaseModule {}

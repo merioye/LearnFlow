@@ -1,14 +1,12 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 
 import { Role } from '@/enums';
 
 import { UserStatus } from '../enums';
+import { BaseEntity } from './base';
 
 @Entity('tbl_users')
-export class UserEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class UserEntity extends BaseEntity {
   @Column({ name: 'first_name' })
   firstName: string;
 
@@ -33,10 +31,4 @@ export class UserEntity {
 
   @Column({ name: 'last_login_at', nullable: true, type: 'timestamp' })
   lastLoginAt: Date | null;
-
-  @Column({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'updated_at' })
-  updatedAt: Date;
 }

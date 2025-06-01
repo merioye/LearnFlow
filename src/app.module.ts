@@ -19,15 +19,20 @@ import {
 import { AllExceptionsFilter } from './core/filters';
 import { ExceptionHandlingStrategyFactory } from './core/filters/factories';
 import { HttpLoggingInterceptor } from './core/interceptors';
-import { CorrelationIdMiddleware } from './core/middlewares';
+import {
+  CorrelationIdMiddleware,
+  requestContextMiddleware,
+} from './core/middlewares';
 import { DatabaseModule } from './database';
 import { Config } from './enums';
 import { ApplicationModule } from './modules/app';
+import { AccessTokenGuard, RolesGuard } from './modules/app/auth';
 import { CsrfGuard } from './modules/app/auth/security/csrf';
 import {
   CustomThrottlerGuard,
   ThrottlerRedisService,
 } from './modules/app/auth/security/throttler';
+import { PermissionGuard } from './modules/app/permissions';
 import { CommonAppModule } from './modules/common';
 import { CACHE_SERVICE, ICacheService } from './modules/common/cache';
 import { ILogger, LOGGER } from './modules/common/logger';
@@ -97,6 +102,9 @@ import { MetricsInterceptor } from './modules/common/metrics';
     { provide: APP_INTERCEPTOR, useClass: HttpLoggingInterceptor },
     { provide: APP_INTERCEPTOR, useClass: MetricsInterceptor },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
+    { provide: APP_GUARD, useClass: AccessTokenGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_GUARD, useClass: PermissionGuard },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe(validationPipeOptions),
@@ -115,6 +123,8 @@ import { MetricsInterceptor } from './modules/common/metrics';
 export class AppModule implements NestModule {
   public configure(consumer: MiddlewareConsumer): void {
     // Apply correlation ID middleware to all routes
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+    consumer
+      .apply(CorrelationIdMiddleware, requestContextMiddleware)
+      .forRoutes('*');
   }
 }

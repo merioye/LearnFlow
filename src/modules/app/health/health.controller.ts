@@ -3,6 +3,7 @@ import { ILogger, InjectLogger } from '@/modules/common/logger';
 
 import { ENDPOINTS } from '@/constants';
 
+import { Public } from '../auth/decorators/public.decorator';
 import { HealthService } from './services';
 import { THealth, TPong } from './types';
 
@@ -11,6 +12,7 @@ import { THealth, TPong } from './types';
  *
  * @class HealthController
  */
+@Public()
 @Controller(ENDPOINTS.Health.Base)
 export class HealthController {
   /**

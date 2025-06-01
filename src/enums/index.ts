@@ -107,3 +107,7 @@ export enum Resource {
   USER = 'User',
   USER_PERMISSION = 'User Permission',
 }
+
+export enum CronJobTask {
+  STORAGE_CLEANUP = 'storage-cleanup',
+}

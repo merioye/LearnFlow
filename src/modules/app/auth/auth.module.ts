@@ -1,8 +1,15 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 
-import { UsersMetrics } from './metrics';
+import { PermissionsModule } from '../permissions';
+import { AuthController } from './auth.controller';
 import { SecurityModule } from './security';
-import { AuthService } from './services';
+import {
+  AuthService,
+  CookiesService,
+  RefreshTokensService,
+  TokensService,
+} from './services';
 
 /**
  * The AuthModule is responsible for managing the authentication functionalities
@@ -12,9 +19,16 @@ import { AuthService } from './services';
  * @module AuthModule
  */
 @Module({
-  imports: [SecurityModule],
-  providers: [UsersMetrics, AuthService],
-  exports: [],
+  imports: [
+    SecurityModule,
+    JwtModule.register({
+      global: true,
+    }),
+    PermissionsModule,
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, CookiesService, RefreshTokensService, TokensService],
+  exports: [RefreshTokensService],
 })
 export class AuthModule {}
 

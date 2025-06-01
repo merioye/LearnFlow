@@ -1,5 +1,7 @@
 import { Request } from 'express';
 
+import { PermissionEntity, UserEntity } from '@/database';
+
 import { Config, Role } from '@/enums';
 
 import { JwtToken } from '../enums';
@@ -45,5 +47,21 @@ export type TCookies = {
 export type TCustomRequest = Request & {
   correlationId: string;
   user: TAuthRequestUser;
+  isAuthenticated?: boolean;
+  refreshTokenPayload: TRefreshTokenPayload;
   cookies: TCookies;
+};
+
+export type TCookieJwtToken = {
+  token: string;
+  type: JwtToken;
+};
+
+export type TAuthTokens = {
+  [JwtToken.ACCESS]: string;
+  [JwtToken.REFRESH]: string;
+};
+
+export type TSelf = Omit<UserEntity, 'password'> & {
+  permissions: PermissionEntity[];
 };
