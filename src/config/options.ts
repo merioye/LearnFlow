@@ -1,7 +1,7 @@
 import { join, resolve } from 'path';
 import { ValidationPipeOptions } from '@nestjs/common';
 import { ConfigModuleOptions, ConfigService } from '@nestjs/config';
-import { RequestValidationError } from '@/common/errors';
+import { RequestValidationError, WSError } from '@/common/errors';
 import { TCacheModuleOptions } from '@/modules/common/cache';
 import { TCronJobModuleOptions } from '@/modules/common/cron-job';
 import { TElasticsearchModuleAsyncOptions } from '@/modules/common/elasticsearch';
@@ -108,6 +108,18 @@ export const configOptions: ConfigModuleOptions = {
     PROMETHEUS_URL: Joi.string().uri().required(),
     PROMETHEUS_USERNAME: Joi.string().required(),
     PROMETHEUS_PASSWORD: Joi.string().required(),
+    // FIREBASE_PROJECT_ID: Joi.string().required(),
+    // FIREBASE_CLIENT_EMAIL: Joi.string().required(),
+    // FIREBASE_PRIVATE_KEY: Joi.string().required(),
+    // SMTP_HOST: Joi.string().uri().required(),
+    // SMTP_PORT: Joi.number().required(),
+    // SMTP_SECURE: Joi.boolean().required(),
+    // SMTP_USER: Joi.string().required(),
+    // SMTP_PASSWORD: Joi.string().required(),
+    // SMTP_FROM: Joi.string().email().required(),
+    // TWILIO_ACCOUNT_SID: Joi.string().required(),
+    // TWILIO_AUTH_TOKEN: Joi.string().required(),
+    // TWILIO_PHONE_NUMBER: Joi.string().required(),
   }),
   validationOptions: {
     abortEarly: true,
@@ -136,6 +148,25 @@ export const validationPipeOptions: ValidationPipeOptions = {
       };
     });
     throw new RequestValidationError(formatedErrors);
+  },
+};
+
+/**
+ * ValidationPipe options for websockets
+ */
+export const wsValidationPipeOptions: ValidationPipeOptions = {
+  ...validationPipeOptions,
+  exceptionFactory: (errors) => {
+    const formatedErrors = errors?.map((error): TErrorFormat => {
+      const message = Object.values(error.constraints || {})[0];
+      return {
+        message: message || 'Invalid value',
+        field: error.property,
+        location: 'body',
+        stack: null,
+      };
+    });
+    throw new WSError(formatedErrors[0]?.message);
   },
 };
 

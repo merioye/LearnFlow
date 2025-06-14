@@ -4,6 +4,7 @@ import { ILogger, InjectLogger } from '@/modules/common/logger';
 import { ENDPOINTS } from '@/constants';
 
 import { Public } from '../auth/decorators/public.decorator';
+import { CustomSkipThrottle } from '../auth/security/throttler';
 import { HealthService } from './services';
 import { THealth, TPong } from './types';
 
@@ -14,6 +15,7 @@ import { THealth, TPong } from './types';
  */
 @Public()
 @Controller(ENDPOINTS.Health.Base)
+@CustomSkipThrottle()
 export class HealthController {
   /**
    * Creates a new HealthController instance.

@@ -12,6 +12,6 @@ const allowedDocumentTypes = [
   'text/csv', // CSV
 ];
 export const allowedFileTypes = new Map<StorageEntity, string[]>([
-  [StorageEntity.USERS, allowedImageTypes],
-  [StorageEntity.USERS, allowedDocumentTypes], // temp remove it
+  [StorageEntity.USER, allowedImageTypes],
+  [StorageEntity.USER, allowedDocumentTypes], // temp remove it
 ]);

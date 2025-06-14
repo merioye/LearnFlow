@@ -4,7 +4,7 @@ import {
   TrimString,
   ValidateIfPresent,
 } from '@/core/decorators';
-import { IsEnum, IsString, IsUrl } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 
 import { UserStatus } from '@/database';
 
@@ -16,7 +16,6 @@ export class UpdateUserDto extends PartialType(
 ) {
   @ValidateIfPresent()
   @TrimString()
-  @IsUrl({}, { message: 'Profile URL must be a valid URL' })
   @IsString({ message: 'Profile URL must be a string' })
   profileUrl?: string;
 

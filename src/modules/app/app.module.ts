@@ -4,6 +4,7 @@ import { AuthModule } from './auth';
 import { HealthModule } from './health';
 import { StorageModule } from './storage';
 import { UsersModule } from './users';
+import { WebsocketsModule } from './websockets';
 
 /**
  * The ApplicationModule is a module that contains all the api related features and
@@ -12,6 +13,12 @@ import { UsersModule } from './users';
  * @module ApplicationModule
  */
 @Module({
-  imports: [HealthModule, AuthModule, UsersModule, StorageModule],
+  imports: [
+    HealthModule,
+    AuthModule,
+    UsersModule,
+    StorageModule,
+    WebsocketsModule,
+  ],
 })
 export class ApplicationModule {}

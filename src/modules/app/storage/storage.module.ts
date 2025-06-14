@@ -1,4 +1,4 @@
-import { Inject, Module } from '@nestjs/common';
+import { Global, Inject, Module } from '@nestjs/common';
 import { CRON_JOB_SERVICE, ICronJobService } from '@/modules/common/cron-job';
 
 import { CronJobTask } from '@/enums';
@@ -15,6 +15,7 @@ import { StorageCleanupTask } from './tasks';
  *
  * @module StorageModule
  */
+@Global()
 @Module({
   controllers: [StorageController],
   providers: [
@@ -25,6 +26,7 @@ import { StorageCleanupTask } from './tasks';
     FileTrackingService,
     StorageCleanupTask,
   ],
+  exports: [FileTrackingService],
 })
 export class StorageModule {
   public constructor(

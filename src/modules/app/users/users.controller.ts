@@ -125,11 +125,7 @@ export class UsersController {
       data: loggerMetadata,
     });
 
-    const { password: _, ...restUserDetails } =
-      await this._usersService.updateById({
-        id: userId,
-        data: input,
-      });
+    const user = await this._usersService.updateOne(userId, input);
 
     this._logger.info('User updated successfully', {
       data: loggerMetadata,
@@ -137,7 +133,7 @@ export class UsersController {
 
     return new ApiResponse({
       message: 'User updated successfully',
-      result: restUserDetails,
+      result: user,
       statusCode: HttpStatus.OK,
     });
   }

@@ -8,7 +8,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InternalServerError } from '@/common/errors';
 import { ApiResponse } from '@/common/utils';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
 
@@ -19,6 +18,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { InjectStorageProvider } from './decorators';
 import { GenerateUploadUrlDto } from './dtos';
 import { IStorageProvider } from './interfaces';
+import { FileTrackingService } from './services';
 import { TGeneratedFileUploadUrl } from './types';
 
 /**
@@ -33,7 +33,8 @@ export class StorageController {
     @InjectStorageProvider()
     private readonly _storageProvider: IStorageProvider,
     @InjectLogger() private readonly _logger: ILogger,
-    private readonly _configService: ConfigService
+    private readonly _configService: ConfigService,
+    private readonly _fileTrackingService: FileTrackingService
   ) {}
 
   /**
@@ -110,10 +111,14 @@ export class StorageController {
       },
     });
 
-    const isDeleted = await this._storageProvider.deleteFile(decodedFilePath);
-    if (!isDeleted) {
-      throw new InternalServerError('Failed to delete the file');
-    }
+    await this._fileTrackingService.updateMany({
+      filter: { filePath: decodedFilePath, ownerId: currentUserId },
+      data: {
+        $inc: {
+          referenceCount: -1,
+        },
+      },
+    });
 
     this._logger.info('Deleted file with path', {
       data: {

@@ -73,7 +73,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     const message = exception.message;
-    this._logger.error(message, metadata);
+    this._logger.error(message, { meta: metadata });
 
     httpAdapter.reply(ctx.getResponse(), responseBody, responseBody.statusCode);
   }

@@ -1,5 +1,5 @@
 export enum StorageEntity {
-  USERS = 'users',
+  USER = 'user',
 }
 
 export enum FileStatus {

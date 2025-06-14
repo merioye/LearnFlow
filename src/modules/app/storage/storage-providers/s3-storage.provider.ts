@@ -165,7 +165,7 @@ export class S3StorageProvider
       const updatedFile = await this._fileTrackingService.updateById({
         id: file.id,
         data: {
-          status: FileStatus.ACTIVE,
+          $set: { status: FileStatus.ACTIVE },
         },
         options: {
           queryRunner,

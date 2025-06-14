@@ -23,7 +23,6 @@ import { CsrfTokenResponse } from './types';
  * @class CsrfController
  */
 @Controller(ENDPOINTS.Csrf.Base)
-// @UseGuards(JwtAuthGuard) // Require JWT authentication
 export class CsrfController {
   public constructor(
     @InjectLogger() private readonly _logger: ILogger,

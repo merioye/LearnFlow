@@ -1,1 +1,1 @@
-// export * from './main-ws.gateway';
+export * from './main-ws.gateway';
