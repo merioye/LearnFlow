@@ -108,18 +108,18 @@ export const configOptions: ConfigModuleOptions = {
     PROMETHEUS_URL: Joi.string().uri().required(),
     PROMETHEUS_USERNAME: Joi.string().required(),
     PROMETHEUS_PASSWORD: Joi.string().required(),
-    // FIREBASE_PROJECT_ID: Joi.string().required(),
-    // FIREBASE_CLIENT_EMAIL: Joi.string().required(),
-    // FIREBASE_PRIVATE_KEY: Joi.string().required(),
-    // SMTP_HOST: Joi.string().uri().required(),
-    // SMTP_PORT: Joi.number().required(),
-    // SMTP_SECURE: Joi.boolean().required(),
-    // SMTP_USER: Joi.string().required(),
-    // SMTP_PASSWORD: Joi.string().required(),
-    // SMTP_FROM: Joi.string().email().required(),
-    // TWILIO_ACCOUNT_SID: Joi.string().required(),
-    // TWILIO_AUTH_TOKEN: Joi.string().required(),
-    // TWILIO_PHONE_NUMBER: Joi.string().required(),
+    FIREBASE_PROJECT_ID: Joi.string().required(),
+    FIREBASE_CLIENT_EMAIL: Joi.string().required(),
+    FIREBASE_PRIVATE_KEY: Joi.string().required(),
+    SMTP_HOST: Joi.string().required(),
+    SMTP_PORT: Joi.number().required(),
+    SMTP_SECURE: Joi.boolean().required(),
+    SMTP_USER: Joi.string().required(),
+    SMTP_PASSWORD: Joi.string().required(),
+    SMTP_FROM: Joi.string().email().required(),
+    TWILIO_ACCOUNT_SID: Joi.string().required(),
+    TWILIO_AUTH_TOKEN: Joi.string().required(),
+    TWILIO_PHONE_NUMBER: Joi.string().required(),
   }),
   validationOptions: {
     abortEarly: true,
@@ -187,18 +187,13 @@ export const cacheOptions: RedisOptions = {
   port: Number(process.env[Config.CACHE_PORT]),
   password: process.env[Config.CACHE_PASSWORD]!,
 
-  // Connection configuration
-  connectTimeout: 10000, // 10 seconds
+  // Connection pooling and performance optimization
   maxRetriesPerRequest: 3,
+  keepAlive: 30000 as unknown as undefined,
+
+  // Connection pool settings
   family: 4,
-  retryStrategy: (times) => {
-    const delay = Math.min(times * 200, 3000); // Exponential backoff with 3s max
-    logger.debug(
-      `Retrying Cache client connection in ${delay}ms (attempt ${times})`
-    );
-    return delay;
-  },
-  // Command execution timeout
+  connectTimeout: 10000, // 10 seconds
   commandTimeout: 5000, // 5 seconds
 
   // Production tuning
@@ -206,10 +201,24 @@ export const cacheOptions: RedisOptions = {
   autoResubscribe: true,
   autoResendUnfulfilledCommands: true,
 
-  // Connection pool (for clustering if needed)
-  // Only needed if you use Redis Cluster
-  // maxRetriesPerRequest: 5,
-  // enableOfflineQueue: true
+  // Cluster support (if using Redis Cluster)
+  ...(process.env[Config.CACHE_CLUSTER_ENABLED] === 'true' && {
+    enableOfflineQueue: false,
+  }),
+
+  // Retry strategy with exponential backoff
+  retryStrategy: (times) => {
+    const delay = Math.min(times * 200, 3000); // Exponential backoff with 3s max
+    logger.debug(
+      `Retrying Cache client connection in ${delay}ms (attempt ${times})`
+    );
+    return delay;
+  },
+  // Reconnect on error
+  reconnectOnError: (err: Error) => {
+    const targetError = 'READONLY';
+    return err.message.includes(targetError);
+  },
 } as const;
 
 export const elasticSearchModuleOptions: TElasticsearchModuleAsyncOptions = {

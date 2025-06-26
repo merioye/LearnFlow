@@ -9,10 +9,10 @@ import { WSAccessTokenGuard, WSPermissionGuard, WSRolesGuard } from './guards';
 import { WSRedisService } from './services';
 
 /**
- * WebSocketModule - Main module for WebSocket functionality
+ * WebSocketsModule - Main module for WebSocket functionality
  * Configures all WebSocket-related services and providers
  *
- * @module WebSocketModule
+ * @module WebSocketsModule
  */
 @Global()
 @Module({
@@ -25,8 +25,8 @@ import { WSRedisService } from './services';
     MainWSGateway,
     {
       provide: APP_FILTER,
-      // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-      useFactory: (logger: ILogger) => new WSExceptionsFilter(logger),
+      useFactory: (logger: ILogger): WSExceptionsFilter =>
+        new WSExceptionsFilter(logger),
       inject: [LOGGER],
     },
   ],

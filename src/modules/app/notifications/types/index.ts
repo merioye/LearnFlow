@@ -99,14 +99,14 @@ export type TNotificationModuleConfig = {
     transport: {
       host: string;
       port: number;
-      secure?: boolean;
-      auth?: {
+      secure: boolean;
+      auth: {
         user: string;
         pass: string;
       };
     };
     /** Default from address */
-    defaultFrom?: string;
+    defaultFrom: string;
     /** Email-specific default options */
     defaultOptions?: TNotificationOptions;
   };
@@ -117,7 +117,7 @@ export type TNotificationModuleConfig = {
     accountSid: string;
     authToken: string;
     /** Default from phone number */
-    defaultFrom?: string;
+    defaultFrom: string;
     /** SMS-specific default options */
     defaultOptions?: TNotificationOptions;
   };
@@ -139,4 +139,58 @@ export type TNotificationModuleConfig = {
     /** Portal-specific default options */
     defaultOptions?: TNotificationOptions;
   };
+};
+
+/**
+ * Result object returned by nodemailer's sendMail method
+ * Contains information about the email sending operation including delivery status and metadata
+ */
+export type TEmailSendResult = {
+  /**
+   * Unique identifier for the sent message
+   * Can be used for tracking and logging purposes
+   * @example "1234567890abcdef@example.com"
+   */
+  messageId: string;
+  /**
+   * Envelope information containing sender and recipient details
+   * Used by the SMTP transport for actual delivery
+   */
+  envelope: {
+    from: string;
+    to: string[];
+  };
+  /**
+   * Array of email addresses that were accepted by the SMTP server
+   * These recipients should receive the email successfully
+   */
+  accepted: string[];
+  /**
+   * Array of email addresses that were rejected by the SMTP server
+   * These recipients will not receive the email due to server-side issues
+   */
+  rejected: string[];
+  /**
+   * Array of email addresses that are pending delivery
+   * These may be retried later by the SMTP server
+   */
+  pending: string[];
+  /**
+   * Raw response string from the SMTP server
+   * Contains status codes and server messages
+   * @example "250 2.0.0 OK 1234567890 - gsmtp"
+   */
+  response: string;
+  /**
+   * Time taken to send the message in milliseconds
+   * Only available with some SMTP transports
+   * @optional
+   */
+  messageTime?: number;
+  /**
+   * Size of the sent message in bytes
+   * Only available with some SMTP transports
+   * @optional
+   */
+  messageSize?: number;
 };

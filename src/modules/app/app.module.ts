@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 
 import { AuthModule } from './auth';
 import { HealthModule } from './health';
+import {
+  NotificationsModule,
+  notificationsModuleConfig,
+} from './notifications';
 import { StorageModule } from './storage';
 import { UsersModule } from './users';
 import { WebsocketsModule } from './websockets';
@@ -19,6 +23,7 @@ import { WebsocketsModule } from './websockets';
     UsersModule,
     StorageModule,
     WebsocketsModule,
+    NotificationsModule.forRoot(notificationsModuleConfig),
   ],
 })
 export class ApplicationModule {}

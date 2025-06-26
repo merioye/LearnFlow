@@ -11,3 +11,14 @@ export enum NotificationMedium {
   PUSH = 'push',
   PORTAL = 'portal',
 }
+
+export enum NotificationStatus {
+  READ = 'read',
+  UNREAD = 'unread',
+}
+
+export enum NotificationType {
+  ENROLLMENT = 'enrollment',
+  PAYMENT = 'payment',
+  CHAT = 'chat',
+}

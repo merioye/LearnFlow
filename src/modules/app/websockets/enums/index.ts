@@ -11,6 +11,7 @@ export enum WSEvent {
   ROOM_LEFT = 'room:left',
   ROOM_MEMBER_JOINED = 'room:member_joined',
   ROOM_MEMBER_LEFT = 'room:member_left',
+  PORTAL_NOTIFICATION = 'portal:notification',
 
   // Utility events
   PING = 'ping',

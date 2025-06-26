@@ -1,5 +1,6 @@
 import {
   HttpStatus,
+  Injectable,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -60,6 +61,7 @@ import {
 @WebSocketGateway({ ...wsGatewayConfig })
 @UseGuards(WSAccessTokenGuard)
 @UseInterceptors(WSLoggingInterceptor)
+@Injectable()
 export class MainWSGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

@@ -78,6 +78,7 @@
     "csrf-csrf": "^4.0.0",
     "dayjs": "^1.11.13",
     "dotenv-cli": "^8.0.0",
+    "firebase-admin": "^13.4.0",
     "helmet": "^8.1.0",
     "http-terminator": "^3.2.0",
     "ioredis": "^5.0.4",

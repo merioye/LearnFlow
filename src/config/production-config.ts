@@ -3,6 +3,8 @@
 
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { TCustomRequest } from '@/modules/app/auth';
+import bodyParser from 'body-parser';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -13,6 +15,23 @@ export function setupProductionApp(
   app: NestExpressApplication,
   configService: ConfigService
 ): NestExpressApplication {
+  // Configure body parser with size limits
+  app.use(
+    bodyParser.json({
+      limit: '2mb',
+      verify: (req: TCustomRequest, _res, buf) => {
+        // Store raw body for webhook verification if needed
+        req.rawBody = buf;
+      },
+    })
+  );
+  app.use(
+    bodyParser.urlencoded({
+      limit: '2mb',
+      extended: true,
+    })
+  );
+
   // Set up secure cookies
   app.use(cookieParser(configService.get(Config.COOKIE_PARSER_SECRET)));
 

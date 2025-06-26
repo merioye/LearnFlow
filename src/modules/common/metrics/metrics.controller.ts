@@ -1,4 +1,5 @@
 import { Controller, Get, Header } from '@nestjs/common';
+import { Public } from '@/modules/app/auth/decorators/public.decorator';
 
 import { ENDPOINTS } from '@/constants';
 
@@ -29,6 +30,7 @@ export class MetricsController {
    * @returns A promise resolving to the metrics data as a plain text string.
    */
   @Get()
+  @Public()
   @Header('Content-Type', 'text/plain')
   async getMetrics(): Promise<string> {
     this._logger.info('Request to fetch application metrics...');

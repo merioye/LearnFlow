@@ -50,6 +50,7 @@ export type TCustomRequest = Request & {
   isAuthenticated?: boolean;
   refreshTokenPayload: TRefreshTokenPayload;
   cookies: TCookies;
+  rawBody?: Buffer<ArrayBufferLike>;
 };
 
 export type TCookieJwtToken = {
