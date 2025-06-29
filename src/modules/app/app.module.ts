@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { AuthModule } from './auth';
+import { CoursesModule } from './courses';
 import { HealthModule } from './health';
 import {
   NotificationsModule,
@@ -24,6 +25,7 @@ import { WebsocketsModule } from './websockets';
     StorageModule,
     WebsocketsModule,
     NotificationsModule.forRoot(notificationsModuleConfig),
+    CoursesModule,
   ],
 })
 export class ApplicationModule {}

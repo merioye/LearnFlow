@@ -7,12 +7,12 @@ export class GenerateUploadUrlDto {
   @TrimString()
   @IsString({ message: 'File type must be a string' })
   @IsNotEmpty({ message: 'File type is required' })
-  fileType!: string;
+  fileType: string;
 
   @TrimString()
   @IsString({ message: 'File name must be a string' })
   @IsNotEmpty({ message: 'File name is required' })
-  fileName!: string;
+  fileName: string;
 
   @TrimString()
   @IsEnum(StorageEntity, {
@@ -20,7 +20,7 @@ export class GenerateUploadUrlDto {
   })
   @IsString({ message: 'Entity type must be a string' })
   @IsNotEmpty({ message: 'Entity type is required' })
-  entityType!: StorageEntity;
+  entityType: StorageEntity;
 
   @ValidateIfPresent()
   @TrimString()

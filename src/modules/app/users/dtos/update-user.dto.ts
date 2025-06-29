@@ -22,7 +22,7 @@ export class UpdateUserDto extends PartialType(
   @ValidateIfPresent()
   @TrimString()
   @IsEnum(UserStatus, {
-    message: `Status is invalid. Allowed values are ${Object.values(UserStatus)?.join(', ')}`,
+    message: `Invalid status, allowed values are ${Object.values(UserStatus)?.join(', ')}`,
   })
   status?: UserStatus;
 }

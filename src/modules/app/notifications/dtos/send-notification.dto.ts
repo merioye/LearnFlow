@@ -18,8 +18,8 @@ export class SendNotificationDto {
   content: NotificationContentDto;
 
   @ValidateIfPresent()
-  @IsEnum(Object.values(NotificationMedium), {
-    message: `Medium is invalid. Allowed values: ${Object.values(NotificationMedium).join(', ')}`,
+  @IsEnum(NotificationMedium, {
+    message: `Invalid medium, allowed values: ${Object.values(NotificationMedium).join(', ')}`,
   })
   @IsString({ message: 'Medium must be a string' })
   medium?: NotificationMedium;

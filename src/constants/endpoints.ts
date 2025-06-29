@@ -68,4 +68,21 @@ export const ENDPOINTS = {
       ConfirmUpload: '/:file-path/confirm-upload',
     },
   },
+  Course: {
+    Base: '/courses',
+    Post: {
+      CreateCourse: '/',
+      EnrollInCourse: '/:id/enroll',
+    },
+    Get: {
+      CourseList: '/',
+      CourseById: '/:id',
+    },
+    Put: {
+      UpdateCourse: '/:id',
+    },
+    Delete: {
+      DeleteCourse: '/:id',
+    },
+  },
 } as const;

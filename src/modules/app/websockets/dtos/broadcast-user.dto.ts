@@ -1,10 +1,10 @@
 import { TrimString, ValidateIfPresent } from '@/core/decorators';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 import { WSNamespace } from '../enums';
 
 export class BroadcastUserDto {
-  @IsNumber({}, { message: 'Target user ID must be a number' })
+  @IsInt({ message: 'Target user ID must be an integer' })
   targetUserId: number;
 
   @TrimString()
@@ -18,7 +18,7 @@ export class BroadcastUserDto {
   @ValidateIfPresent()
   @TrimString()
   @IsEnum(WSNamespace, {
-    message: `Namespace is invalid. Allowed values are ${Object.values(WSNamespace)?.join(', ')}`,
+    message: `Invalid namespace, allowed values are ${Object.values(WSNamespace)?.join(', ')}`,
   })
   namespace?: WSNamespace;
 }

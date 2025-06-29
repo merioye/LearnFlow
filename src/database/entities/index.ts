@@ -6,3 +6,4 @@ export * from './refresh-token.entity';
 export * from './distributed-lock.entity';
 export * from './file-tracking.entity';
 export * from './notification.entity';
+export * from './course.entity';

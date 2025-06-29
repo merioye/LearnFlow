@@ -16,14 +16,14 @@ export class GetUserListDto extends OffsetPaginationDto {
   @ValidateIfPresent()
   @TrimString()
   @IsEnum(UserStatus, {
-    message: `Status is invalid. Allowed values are ${Object.values(UserStatus)?.join(', ')}`,
+    message: `Invalid status, allowed values are ${Object.values(UserStatus)?.join(', ')}`,
   })
   status?: UserStatus;
 
   @ValidateIfPresent()
   @TrimString()
   @IsEnum(Role, {
-    message: `Role is invalid. Allowed values are ${Object.values(Role).join(
+    message: `Invalid role, allowed values are ${Object.values(Role).join(
       ', '
     )}`,
   })

@@ -12,7 +12,7 @@ export class JoinRoomDto {
   @ValidateIfPresent()
   @TrimString()
   @IsEnum(WSNamespace, {
-    message: `Namespace is invalid. Allowed values are ${Object.values(WSNamespace)?.join(', ')}`,
+    message: `Invalid namespace, allowed values are ${Object.values(WSNamespace)?.join(', ')}`,
   })
   namespace?: WSNamespace;
 

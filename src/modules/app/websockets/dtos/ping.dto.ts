@@ -1,9 +1,9 @@
 import { ValidateIfPresent } from '@/core/decorators';
-import { IsNumber, IsString } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 
 export class PingDto {
   @ValidateIfPresent()
-  @IsNumber({}, { message: 'Timestamp must be a number' })
+  @IsInt({ message: 'Timestamp must be an integer' })
   timestamp?: number;
 
   @ValidateIfPresent()

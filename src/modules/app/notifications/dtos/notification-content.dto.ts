@@ -1,16 +1,19 @@
-import { ValidateIfPresent } from '@/core/decorators';
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import { IsArray, IsNotEmpty, IsObject, IsString } from 'class-validator';
 
 export class NotificationContentDto {
+  @TrimString()
   @IsString({ message: 'Subject must a string' })
   @IsNotEmpty({ message: 'Subject is required' })
   subject: string;
 
+  @TrimString()
   @IsString({ message: 'Body must be a string' })
   @IsNotEmpty({ message: 'Body is required' })
   body: string;
 
   @ValidateIfPresent()
+  @TrimString()
   @IsString({ message: 'Html must be a string' })
   html?: string;
 

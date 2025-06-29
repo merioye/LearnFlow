@@ -42,6 +42,8 @@ export class CreateUserDto {
 
   @ValidateIfPresent()
   @TrimString()
-  @IsEnum(Role, { message: 'Role is invalid' })
+  @IsEnum(Role, {
+    message: `Invalid role, allowed values are ${Object.values(Role)?.join(', ')}`,
+  })
   role?: Role = Role.STUDENT;
 }

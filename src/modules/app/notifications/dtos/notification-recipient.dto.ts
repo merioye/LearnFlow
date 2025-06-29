@@ -1,7 +1,7 @@
-import { ValidateIfPresent } from '@/core/decorators';
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import {
   IsEmail,
-  IsNumber,
+  IsInt,
   IsObject,
   IsPhoneNumber,
   IsPositive,
@@ -10,22 +10,25 @@ import {
 
 export class NotificationRecipientDto {
   @ValidateIfPresent()
+  @TrimString()
   @IsEmail({}, { message: 'Email is invalid' })
   @IsString({ message: 'Email must be a string' })
   email?: string;
 
   @ValidateIfPresent()
+  @TrimString()
   @IsPhoneNumber(undefined, { message: 'Phone number is invalid' })
   @IsString({ message: 'Phone number must be a string' })
   phoneNumber?: string;
 
   @ValidateIfPresent()
+  @TrimString()
   @IsString({ message: 'Device token must be a string' })
   deviceToken?: string;
 
   @ValidateIfPresent()
-  @IsPositive({ message: 'User ID must be a positive number' })
-  @IsNumber({}, { message: 'User ID must be a number' })
+  @IsPositive({ message: 'User ID must be a positive integer' })
+  @IsInt({ message: 'User ID must be an integer' })
   userId?: number;
 
   @ValidateIfPresent()
