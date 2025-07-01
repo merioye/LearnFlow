@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { DatabaseHealthService } from '@/database/services';
 // import { ElasticsearchHealthService } from '@/modules/common/elasticsearch';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
-
-import { DatabaseHealthService } from '@/database';
 
 import { THealth, TPong } from '../types';
 

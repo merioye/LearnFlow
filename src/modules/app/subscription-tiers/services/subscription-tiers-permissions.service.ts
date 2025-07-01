@@ -4,20 +4,21 @@ import { BaseTypeOrmService } from '@/database/services';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { DataSource } from 'typeorm';
 
-import { FileTrackingEntity } from '@/database';
+import { SubscriptionTierPermissionEntity } from '@/database';
 
 /**
- * Service class for managing files tracking
- * @class FileTrackingService
- * @extends BaseTypeOrmService<FileTrackingEntity>
+ * Service for managing subscription tier permissions
+ *
+ * @class SubscriptionTiersPermissionsService
+ * @extends {BaseTypeOrmService}
  */
 @Injectable()
-export class FileTrackingService extends BaseTypeOrmService<FileTrackingEntity> {
+export class SubscriptionTiersPermissionsService extends BaseTypeOrmService<SubscriptionTierPermissionEntity> {
   public constructor(
     @InjectDateTime() dateTime: IDateTime,
     @InjectDataSource() dataSource: DataSource
   ) {
-    super(dateTime, dataSource, FileTrackingEntity, {
+    super(dateTime, dataSource, SubscriptionTierPermissionEntity, {
       softDelete: false,
     });
   }

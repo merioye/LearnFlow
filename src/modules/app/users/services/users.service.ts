@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BadRequestError, NotFoundError } from '@/common/errors';
+import { BaseTypeOrmService } from '@/database/services';
 import { IHashService, InjectHashService } from '@/modules/common/hash';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
 import { DataSource, ILike } from 'typeorm';
 
 import {
-  BaseTypeOrmService,
   TTypeOrmFilterQuery,
   TTypeOrmSort,
   UserEntity,

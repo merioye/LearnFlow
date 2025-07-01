@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BadRequestError, NotFoundError } from '@/common/errors';
-import { CourseEntity, UserEntity } from '@/database/entities';
-import { BaseTypeOrmService } from '@/database/services/base-typeorm.service';
-import { FileStatus } from '@/modules/app/storage/enums';
-import { FileTrackingService } from '@/modules/app/storage/services';
+import { BaseTypeOrmService } from '@/database/services';
+import { FileStatus, FileTrackingService } from '@/modules/app/storage';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
 import { DataSource, ILike, QueryRunner } from 'typeorm';
 
-import { TTypeOrmFilterQuery, TTypeOrmSort } from '@/database';
+import {
+  CourseEntity,
+  TTypeOrmFilterQuery,
+  TTypeOrmSort,
+  UserEntity,
+} from '@/database';
 
 import { TOffsetPaginatedResult } from '@/types';
 import { SortDirection } from '@/enums';

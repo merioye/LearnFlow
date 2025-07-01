@@ -85,4 +85,19 @@ export const ENDPOINTS = {
       DeleteCourse: '/:id',
     },
   },
+  SubscriptionTier: {
+    Base: '/subscription-tier',
+    Post: {
+      CreateSubscriptionTier: '/',
+    },
+    Put: {
+      UpdateSubscriptionTier: '/:id',
+    },
+    Delete: {
+      DeleteSubscriptionTier: '/:id',
+    },
+    Get: {
+      SubscriptionTierList: '/',
+    },
+  },
 } as const;

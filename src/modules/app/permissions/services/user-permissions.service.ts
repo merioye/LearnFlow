@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BadRequestError, NotFoundError } from '@/common/errors';
+import { BaseTypeOrmService } from '@/database/services';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { DataSource, In } from 'typeorm';
 
-import {
-  BaseTypeOrmService,
-  PermissionEntity,
-  UserPermissionEntity,
-  UserStatus,
-} from '@/database';
+import { PermissionEntity, UserPermissionEntity, UserStatus } from '@/database';
 
 import { UsersService } from '../../users';
 import { AssignUserPermissionDto } from '../dtos';

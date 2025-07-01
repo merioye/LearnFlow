@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { BaseTypeOrmService } from '@/database/services';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { DataSource } from 'typeorm';
 
-import { BaseTypeOrmService, RefreshTokenEntity, UserEntity } from '@/database';
+import { RefreshTokenEntity, UserEntity } from '@/database';
 
 import { Config } from '@/enums';
 

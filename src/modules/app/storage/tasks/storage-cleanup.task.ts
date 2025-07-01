@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DistributedLockService } from '@/database/services';
 import {
   BaseCronJobTask,
   TCronJobTaskContext,
@@ -8,7 +9,7 @@ import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
 import { In, LessThan } from 'typeorm';
 
-import { DistributedLockService, FileTrackingEntity } from '@/database';
+import { FileTrackingEntity } from '@/database';
 
 import { Config } from '@/enums';
 

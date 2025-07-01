@@ -7,3 +7,5 @@ export * from './distributed-lock.entity';
 export * from './file-tracking.entity';
 export * from './notification.entity';
 export * from './course.entity';
+export * from './subscription-tier-permission.entity';
+export * from './subscription-tier.entity';
