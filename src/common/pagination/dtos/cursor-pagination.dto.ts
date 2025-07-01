@@ -1,10 +1,4 @@
 import {
-  ParseBoolean,
-  ParseJson,
-  ParseNumber,
-  ValidateIfPresent,
-} from '@/core/decorators';
-import {
   IsBoolean,
   IsEnum,
   IsInt,
@@ -12,6 +6,13 @@ import {
   IsString,
   Max,
 } from 'class-validator';
+
+import {
+  ParseBoolean,
+  ParseJson,
+  ParseNumber,
+  ValidateIfPresent,
+} from '@/core/decorators';
 
 import { CursorPaginateDirection, SortDirection } from '@/enums';
 import { PAGINATION } from '@/constants';

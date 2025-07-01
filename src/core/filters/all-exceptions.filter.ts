@@ -2,9 +2,10 @@ import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
 import { Request } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+
 import { RequestValidationError } from '@/common/errors';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import { v4 as uuidv4 } from 'uuid';
 
 import { TLoggerErrorMetadata } from '@/types';
 import { Config, Environment } from '@/enums';

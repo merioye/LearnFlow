@@ -9,10 +9,11 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+
 import { ApiResponse } from '@/common/utils';
 import { CustomParseIntPipe } from '@/core/pipes';
-import { CourseEntity } from '@/database/entities';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
+import { CourseEntity } from '@/database/entities';
 
 import { TOffsetPaginatedResult } from '@/types';
 import { Role } from '@/enums';

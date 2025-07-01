@@ -1,4 +1,5 @@
 import { Controller, Get, Header } from '@nestjs/common';
+
 import { Public } from '@/modules/app/auth/decorators/public.decorator';
 
 import { ENDPOINTS } from '@/constants';

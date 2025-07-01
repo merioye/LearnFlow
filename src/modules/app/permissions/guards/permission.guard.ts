@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+
 import { ForbiddenError, NotAuthorizedError } from '@/common/errors';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
 

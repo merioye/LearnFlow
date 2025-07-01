@@ -1,5 +1,6 @@
-import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import { IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
+
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 
 import { WSNamespace } from '../enums';
 

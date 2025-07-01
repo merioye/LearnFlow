@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
+
 import { WSExceptionsFilter } from '@/core/filters';
 import { WSLoggingInterceptor } from '@/core/interceptors';
 import { ILogger, LOGGER } from '@/modules/common/logger';

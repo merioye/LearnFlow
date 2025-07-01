@@ -1,5 +1,6 @@
-import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import { IsArray, IsNotEmpty, IsObject, IsString } from 'class-validator';
+
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 
 export class NotificationContentDto {
   @TrimString()

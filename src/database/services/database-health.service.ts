@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import { DataSource } from 'typeorm';
 
 import { TDatabaseHealth } from '../types';
 

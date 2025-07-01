@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
+import { doubleCsrf, DoubleCsrfProtection } from 'csrf-csrf';
+
 import { ForbiddenError } from '@/common/errors';
 import { IHashService, InjectHashService } from '@/modules/common/hash';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import { doubleCsrf, DoubleCsrfProtection } from 'csrf-csrf';
 
 import { Config, Environment } from '@/enums';
 

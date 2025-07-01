@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import twilio from 'twilio';
+import { MessageInstance } from 'twilio/lib/rest/api/v2010/account/message';
+import { v4 as uuidv4 } from 'uuid';
+
 import { ForbiddenError, InternalServerError } from '@/common/errors';
 import { retry } from '@/common/utils';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import twilio from 'twilio';
-import { MessageInstance } from 'twilio/lib/rest/api/v2010/account/message';
-import { v4 as uuidv4 } from 'uuid';
 
 import { InjectNotificationModuleConfig } from '../decorators';
 import { NotificationMedium } from '../enums';

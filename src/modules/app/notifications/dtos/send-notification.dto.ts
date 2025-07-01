@@ -1,6 +1,7 @@
-import { ValidateIfPresent } from '@/core/decorators';
 import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsString, ValidateNested } from 'class-validator';
+
+import { ValidateIfPresent } from '@/core/decorators';
 
 import { NotificationMedium } from '../enums';
 import { NotificationContentDto } from './notification-content.dto';

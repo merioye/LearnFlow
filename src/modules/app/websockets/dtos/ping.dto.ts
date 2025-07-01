@@ -1,5 +1,6 @@
-import { ValidateIfPresent } from '@/core/decorators';
 import { IsInt, IsString } from 'class-validator';
+
+import { ValidateIfPresent } from '@/core/decorators';
 
 export class PingDto {
   @ValidateIfPresent()

@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ThrottlerModule as NestThrottlerModule } from '@nestjs/throttler';
+
 import { ILogger, LOGGER } from '@/modules/common/logger';
 
 import { throttlerConfig } from './constants';

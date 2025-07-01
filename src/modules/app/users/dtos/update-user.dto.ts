@@ -1,11 +1,11 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { IsEnum, IsString } from 'class-validator';
+
 import {
   IsAtLeastOneFieldProvided,
   TrimString,
   ValidateIfPresent,
 } from '@/core/decorators';
-import { IsEnum, IsString } from 'class-validator';
-
 import { UserStatus } from '@/database';
 
 import { CreateUserDto } from './create-user.dto';

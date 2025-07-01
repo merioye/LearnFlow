@@ -1,5 +1,6 @@
-import { CourseLevel, CourseStatus } from '@/modules/app/courses';
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+
+import { CourseLevel, CourseStatus } from '@/modules/app/courses';
 
 import { BaseEntity } from './base';
 import { UserEntity } from './user.entity';

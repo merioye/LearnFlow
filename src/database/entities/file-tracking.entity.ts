@@ -1,5 +1,6 @@
-import { FileStatus } from '@/modules/app/storage/enums';
 import { Column, Entity, Index } from 'typeorm';
+
+import { FileStatus } from '@/modules/app/storage/enums';
 
 import { BaseEntity } from './base';
 

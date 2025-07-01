@@ -1,8 +1,9 @@
+import { Column, Entity, Index, OneToMany } from 'typeorm';
+
 import {
   SubscriptionTier,
   SupportLevel,
 } from '@/modules/app/subscription-tiers';
-import { Column, Entity, Index, OneToMany } from 'typeorm';
 
 import { BaseEntity } from './base';
 import { SubscriptionTierPermissionEntity } from './subscription-tier-permission.entity';

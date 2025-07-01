@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import * as nodemailer from 'nodemailer';
+import { v4 as uuidv4 } from 'uuid';
+
 import { ForbiddenError, InternalServerError } from '@/common/errors';
 import { retry } from '@/common/utils';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import * as nodemailer from 'nodemailer';
-import { v4 as uuidv4 } from 'uuid';
 
 import { InjectNotificationModuleConfig } from '../decorators';
 import { NotificationMedium } from '../enums';

@@ -1,5 +1,6 @@
-import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 
 import { StorageEntity } from '../enums';
 

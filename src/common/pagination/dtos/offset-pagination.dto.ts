@@ -1,10 +1,11 @@
+import { IsBoolean, IsInt, IsPositive, Max } from 'class-validator';
+
 import {
   ParseBoolean,
   ParseJson,
   ParseNumber,
   ValidateIfPresent,
 } from '@/core/decorators';
-import { IsBoolean, IsInt, IsPositive, Max } from 'class-validator';
 
 import { SortDirection } from '@/enums';
 import { PAGINATION } from '@/constants';

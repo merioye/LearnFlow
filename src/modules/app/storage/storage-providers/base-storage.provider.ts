@@ -1,4 +1,5 @@
 import * as path from 'path';
+
 import { BadRequestError } from '@/common/errors';
 
 import { allowedFileTypes } from '../constants';

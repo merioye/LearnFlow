@@ -1,4 +1,3 @@
-import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import {
   IsEmail,
   IsEnum,
@@ -6,6 +5,8 @@ import {
   IsString,
   IsStrongPassword,
 } from 'class-validator';
+
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 
 import { Role } from '@/enums';
 

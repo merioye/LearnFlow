@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
+
 import { ForbiddenError, NotAuthorizedError } from '@/common/errors';
 import { IHashService, InjectHashService } from '@/modules/common/hash';
-
 import { UserStatus } from '@/database';
 
 import { Role } from '@/enums';

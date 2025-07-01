@@ -1,9 +1,10 @@
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+
 import {
   NotificationPriority,
   NotificationStatus,
   NotificationType,
 } from '@/modules/app/notifications';
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 
 import { BaseEntity } from './base';
 import { UserEntity } from './user.entity';

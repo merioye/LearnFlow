@@ -3,11 +3,12 @@
 
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { TCustomRequest } from '@/modules/app/auth';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+
+import { TCustomRequest } from '@/modules/app/auth';
 
 import { Config } from '@/enums';
 

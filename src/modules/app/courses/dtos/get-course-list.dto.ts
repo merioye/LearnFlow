@@ -1,6 +1,7 @@
+import { IsEnum, IsInt, IsPositive, IsString } from 'class-validator';
+
 import { OffsetPaginationDto } from '@/common/pagination';
 import { TrimString, ValidateIfPresent } from '@/core/decorators';
-import { IsEnum, IsInt, IsPositive, IsString } from 'class-validator';
 
 import { CourseLevel, CourseStatus } from '../enums';
 

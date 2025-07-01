@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InternalServerError, NotFoundError } from '@/common/errors';
-import { ILogger, InjectLogger } from '@/modules/common/logger';
 import {
   DeleteObjectCommand,
   HeadObjectCommand,
@@ -11,6 +9,8 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
 
+import { InternalServerError, NotFoundError } from '@/common/errors';
+import { ILogger, InjectLogger } from '@/modules/common/logger';
 import { FileTrackingEntity } from '@/database';
 
 import { Config, Environment } from '@/enums';

@@ -1,4 +1,5 @@
 import { Global, Inject, Module } from '@nestjs/common';
+
 import { CRON_JOB_SERVICE, ICronJobService } from '@/modules/common/cron-job';
 
 import { CronJobTask } from '@/enums';

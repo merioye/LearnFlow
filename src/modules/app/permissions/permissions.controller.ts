@@ -8,10 +8,10 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+
 import { ApiResponse } from '@/common/utils';
 import { CustomParseIntPipe } from '@/core/pipes';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-
 import {
   PermissionEntity,
   PermissionGroupEntity,

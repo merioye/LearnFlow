@@ -1,6 +1,7 @@
+import { IsNotEmpty, IsString } from 'class-validator';
+
 import { OffsetPaginationDto } from '@/common/pagination';
 import { TrimString, ValidateIfPresent } from '@/core/decorators';
-import { IsNotEmpty, IsString } from 'class-validator';
 
 export class GetPermissionListDto extends OffsetPaginationDto {
   @ValidateIfPresent()

@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+
 import { IDateTime } from '@/modules/common/helper/date-time';
 import { ILogger } from '@/modules/common/logger';
-import { v4 as uuidv4 } from 'uuid';
 
 import { NotificationMedium } from '../enums';
 import { INotificationProvider, INotificationsService } from '../interfaces';

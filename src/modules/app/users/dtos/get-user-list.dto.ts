@@ -1,7 +1,7 @@
-import { OffsetPaginationDto } from '@/common/pagination';
-import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
+import { OffsetPaginationDto } from '@/common/pagination';
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import { UserStatus } from '@/database';
 
 import { Role } from '@/enums';

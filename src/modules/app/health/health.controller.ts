@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+
 import { ILogger, InjectLogger } from '@/modules/common/logger';
 
 import { ENDPOINTS } from '@/constants';

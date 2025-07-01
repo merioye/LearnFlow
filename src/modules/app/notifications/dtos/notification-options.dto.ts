@@ -1,4 +1,3 @@
-import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import {
   IsBoolean,
   IsEnum,
@@ -6,6 +5,8 @@ import {
   IsPositive,
   IsString,
 } from 'class-validator';
+
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 
 import { NotificationPriority } from '../enums';
 

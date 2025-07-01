@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
+
 import { InternalServerError } from '@/common/errors';
 
 import { ILogger, InjectLogger } from '../../logger';

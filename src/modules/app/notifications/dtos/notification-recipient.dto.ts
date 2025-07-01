@@ -1,4 +1,3 @@
-import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import {
   IsEmail,
   IsInt,
@@ -7,6 +6,8 @@ import {
   IsPositive,
   IsString,
 } from 'class-validator';
+
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 
 export class NotificationRecipientDto {
   @ValidateIfPresent()

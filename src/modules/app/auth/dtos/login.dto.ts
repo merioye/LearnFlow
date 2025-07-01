@@ -1,5 +1,6 @@
-import { TrimString } from '@/core/decorators';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+
+import { TrimString } from '@/core/decorators';
 
 export class LoginDto {
   @TrimString()

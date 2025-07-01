@@ -1,4 +1,3 @@
-import { TrimString, ValidateIfPresent } from '@/core/decorators';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -11,6 +10,8 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+
+import { TrimString, ValidateIfPresent } from '@/core/decorators';
 
 import { SubscriptionTier, SupportLevel } from '../enums';
 

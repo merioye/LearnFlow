@@ -16,12 +16,13 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { Namespace, Server } from 'socket.io';
+
 import { WSError } from '@/common/errors';
 import { WSLoggingInterceptor } from '@/core/interceptors';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import { createAdapter } from '@socket.io/redis-adapter';
-import { Namespace, Server } from 'socket.io';
 
 import { wsValidationPipeOptions } from '@/config';
 

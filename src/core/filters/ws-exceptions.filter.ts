@@ -1,4 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+
 import { WSError } from '@/common/errors';
 import {
   TCustomSocket,
@@ -6,7 +8,6 @@ import {
   WSEvent,
 } from '@/modules/app/websockets';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * WebSocket exception filter for handling errors during WebSocket operations

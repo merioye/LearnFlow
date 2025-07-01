@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+
 import { ForbiddenError } from '@/common/errors';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import { v4 as uuidv4 } from 'uuid';
 
 import { MainWSGateway, WSEvent } from '../../websockets';
 import { InjectNotificationModuleConfig } from '../decorators';

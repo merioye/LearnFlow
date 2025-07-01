@@ -1,8 +1,9 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
-import { TCustomRequest } from '@/modules/app/auth';
 import { parse } from 'useragent';
+
+import { TCustomRequest } from '@/modules/app/auth';
 
 import { DeviceInfo } from '../types';
 

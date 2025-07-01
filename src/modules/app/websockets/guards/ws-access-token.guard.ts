@@ -7,9 +7,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
+
 import { WSError } from '@/common/errors';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-
 import { UserStatus } from '@/database';
 
 import { Config } from '@/enums';

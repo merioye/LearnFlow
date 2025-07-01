@@ -1,6 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { ILogger, InjectLogger } from '@/modules/common/logger';
 import Redis from 'ioredis';
+
+import { ILogger, InjectLogger } from '@/modules/common/logger';
 
 import { cacheOptions } from '@/config';
 import { RedisDB } from '@/enums';

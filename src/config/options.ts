@@ -1,14 +1,15 @@
 import { join, resolve } from 'path';
 import { ValidationPipeOptions } from '@nestjs/common';
 import { ConfigModuleOptions, ConfigService } from '@nestjs/config';
+import * as dotenv from 'dotenv';
+import { RedisOptions } from 'ioredis';
+import Joi from 'joi';
+
 import { RequestValidationError, WSError } from '@/common/errors';
 import { TCacheModuleOptions } from '@/modules/common/cache';
 import { TCronJobModuleOptions } from '@/modules/common/cron-job';
 import { TElasticsearchModuleAsyncOptions } from '@/modules/common/elasticsearch';
 import { TLoggerModuleOptions, WinstonLogger } from '@/modules/common/logger';
-import * as dotenv from 'dotenv';
-import { RedisOptions } from 'ioredis';
-import Joi from 'joi';
 
 import { TErrorFormat } from '@/types';
 import { Config, Environment } from '@/enums';
