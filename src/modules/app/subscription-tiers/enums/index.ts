@@ -16,12 +16,3 @@ export enum SupportLevel {
   PRIORITY = 'priority',
   DEDICATED = 'dedicated',
 }
-
-export enum Currency {
-  USD = 'USD',
-  EUR = 'EUR',
-  GBP = 'GBP',
-  CAD = 'CAD',
-  INR = 'INR',
-  PKR = 'PKR',
-}
