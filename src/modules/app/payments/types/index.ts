@@ -5,6 +5,9 @@ import {
   PaymentFlowType,
   PaymentMethod,
   PaymentProvider,
+  PaymentSettlementSchedule,
+  PayoutMethod,
+  RefundRequestAttachmentType,
 } from '../enums';
 
 /**
@@ -237,4 +240,124 @@ export type TCreateSubscriptionInput = {
 export type TUpdateSubscriptionInput = {
   subscriptionId: number;
   planId: number;
+};
+
+/**
+ * Payment method configuration
+ */
+export type TPaymentMethodConfig = {
+  apiKey?: string;
+  secretKey?: string;
+  webhookSecret?: string;
+  environment: 'sandbox' | 'production';
+  [key: string]: any;
+};
+
+/**
+ * Payment method fee structure
+ */
+export type TPaymentMethodFeeStructure = {
+  fixedFee?: number;
+  percentageFee?: number;
+  currency?: Currency;
+  [key: string]: any;
+};
+
+/**
+ * Payment method transaction amount limits
+ */
+export type TPaymentMethodAmountLimits = Record<
+  Currency,
+  {
+    min: number;
+    max: number;
+  }
+>;
+
+/**
+ * Payment method webhook configuration
+ */
+export type TPaymentMethodWebhookConfig = {
+  url?: string;
+  events?: string[];
+  secret?: string;
+  [key: string]: any;
+};
+
+/**
+ * Payment method rate limit configuration
+ */
+export type TPaymentMethodRateLimitConfig = {
+  requestsPerMinute?: number;
+  requestsPerHour?: number;
+  requestsPerDay?: number;
+};
+
+/**
+ * Payment settlement item
+ */
+export type TSettlementItem = {
+  paymentId: number;
+  amount: number;
+  commission: number;
+  processingFee: number;
+  netAmount: number;
+  transactionDate: Date;
+  type: 'payment' | 'refund' | 'chargeback' | 'adjustment';
+};
+
+/**
+ * Refund request attachment
+ */
+export type TRefundRequestAttachment = {
+  filename: string;
+  url: string;
+  type: RefundRequestAttachmentType;
+  size: number;
+  uploadedAt: Date;
+};
+
+/**
+ * Payment provider account credentials
+ */
+export type TPaymentProviderAccountCredentials = {
+  accessToken?: string;
+  refreshToken?: string;
+  merchantId?: string;
+  [key: string]: any;
+};
+
+/**
+ * Payment settlement configuration
+ */
+export type TPaymentSettlementConfig = {
+  delayDays?: number;
+  autoSettle?: boolean;
+  minimumAmount?: number;
+  currency?: Currency;
+  schedule?: PaymentSettlementSchedule;
+};
+
+/**
+ * Payment payout configuration
+ */
+export type TPayoutConfig = {
+  method: PayoutMethod;
+  bankAccount?: {
+    accountNumber: string;
+    routingNumber: string;
+    accountHolderName: string;
+  };
+  paypalEmail?: string;
+  stripeAccountId?: string;
+};
+
+/**
+ * Payment configuration verification data
+ */
+export type TPaymentConfigVerificationData = {
+  documentsProvided?: string[];
+  verificationDate?: string;
+  rejectionReason?: string;
+  requiredActions?: string[];
 };

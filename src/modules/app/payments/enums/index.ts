@@ -19,6 +19,15 @@ export enum PaymentProvider {
 }
 
 /**
+ * Payout methods for settlement
+ */
+export enum PayoutMethod {
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  PAYPAL = 'PAYPAL',
+  STRIPE_CONNECT = 'STRIPE_CONNECT',
+}
+
+/**
  * Payment transaction status lifecycle
  * Covers all possible states from initiation to completion
  */
@@ -38,11 +47,11 @@ export enum PaymentStatus {
  * Settlement status for multi-vendor payments
  */
 export enum SettlementStatus {
-  PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-  CANCELLED = 'CANCELLED',
+  PENDING = 'PENDING', // Settlement pending
+  PROCESSING = 'PROCESSING', // Settlement in progress
+  COMPLETED = 'COMPLETED', // Settlement completed
+  FAILED = 'FAILED', // Settlement failed
+  CANCELLED = 'CANCELLED', // Settlement cancelled
 }
 
 /**
@@ -73,4 +82,94 @@ export enum Currency {
   CAD = 'CAD',
   INR = 'INR',
   PKR = 'PKR',
+}
+
+/**
+ * Payment refund request reasons
+ */
+export enum RefundReason {
+  CUSTOMER_REQUEST = 'CUSTOMER_REQUEST', // Customer requested a refund
+  MERCHANT_INITIATED = 'MERCHANT_INITIATED', // Merchant initiated a refund
+  QUALITY_ISSUE = 'QUALITY_ISSUE', // Quality issue (e.g. content not as described)
+  UNAUTHORIZED_TRANSACTION = 'UNAUTHORIZED_TRANSACTION', // Unauthorized transaction
+  DUPLICATE_CHARGE = 'DUPLICATE_CHARGE', // Duplicate charge (e.g. charged twice for the same transaction)
+  TECHNICAL_ERROR = 'TECHNICAL_ERROR', // Technical error (e.g. payment gateway error)
+  POLICY_VIOLATION = 'POLICY_VIOLATION', // Policy violation (e.g. refund policy violation)
+  CHARGEBACK_PREVENTION = 'CHARGEBACK_PREVENTION', // Chargeback prevention (e.g. chargeback prevention)
+  OTHER = 'OTHER', // Other (e.g. other reason not listed above)
+}
+
+/**
+ * Refund methods
+ */
+export enum RefundMethod {
+  AUTOMATIC = 'AUTOMATIC', // Refund automatically
+  MANUAL = 'MANUAL', // Refund manually
+  ORIGINAL_PAYMENT_METHOD = 'ORIGINAL_PAYMENT_METHOD', // Refund using original payment method
+}
+
+/**
+ * Webhook processing status enum
+ */
+export enum WebhookStatus {
+  PENDING = 'PENDING', // Webhook pending
+  PROCESSING = 'PROCESSING', // Webhook in progress
+  PROCESSED = 'PROCESSED', // Webhook processed
+  FAILED = 'FAILED', // Webhook failed
+  RETRY = 'RETRY', // Webhook retry
+  IGNORED = 'IGNORED', // Webhook ignored
+}
+
+/**
+ * Event names for internal event system
+ */
+export enum PaymentEvent {
+  PAYMENT_CREATED = 'payment.created',
+  PAYMENT_COMPLETED = 'payment.completed',
+  PAYMENT_FAILED = 'payment.failed',
+  PAYMENT_REFUNDED = 'payment.refunded',
+  SUBSCRIPTION_CREATED = 'subscription.created',
+  SUBSCRIPTION_UPDATED = 'subscription.updated',
+  SUBSCRIPTION_CANCELLED = 'subscription.cancelled',
+  SETTLEMENT_INITIATED = 'settlement.initiated',
+  SETTLEMENT_COMPLETED = 'settlement.completed',
+  WEBHOOK_RECEIVED = 'webhook.received',
+  WEBHOOK_PROCESSED = 'webhook.processed',
+}
+
+/**
+ * Provider transaction type
+ */
+export enum ProviderTransactionType {
+  ATTEMPT = 'attempt',
+  REFUND = 'refund',
+  CAPTURE = 'capture',
+}
+
+/**
+ * Payment config verification status
+ */
+export enum PaymentConfigVerificationStatus {
+  PENDING = 'PENDING', // Payment config verification pending
+  VERIFIED = 'VERIFIED', // Payment config verified
+  REJECTED = 'REJECTED', // Payment config rejected
+  REQUIRES_ACTION = 'REQUIRES_ACTION', // Payment config requires action
+}
+
+/**
+ * Payment settlement schedule
+ */
+export enum PaymentSettlementSchedule {
+  DAILY = 'DAILY', // Daily settlement
+  WEEKLY = 'WEEKLY', // Weekly settlement
+  MONTHLY = 'MONTHLY', // Monthly settlement
+}
+
+/**
+ * Refund request attachment type
+ */
+export enum RefundRequestAttachmentType {
+  IMAGE = 'IMAGE',
+  DOCUMENT = 'DOCUMENT',
+  OTHER = 'OTHER',
 }

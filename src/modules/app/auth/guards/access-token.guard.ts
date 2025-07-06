@@ -5,11 +5,10 @@ import { JwtService } from '@nestjs/jwt';
 
 import { NotAuthorizedError } from '@/common/errors';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import { UserStatus } from '@/database';
 
 import { Config } from '@/enums';
 
-import { UsersService } from '../../users';
+import { UsersService, UserStatus } from '../../users';
 import { IS_PUBLIC_DECORATOR_KEY } from '../constants';
 import { TAccessTokenPayload, TCustomRequest } from '../types';
 

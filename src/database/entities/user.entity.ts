@@ -1,9 +1,11 @@
-import { Column, Entity, Index } from 'typeorm';
+import { Column, Entity, Index, OneToMany } from 'typeorm';
+
+import { UserStatus } from '@/modules/app/users';
 
 import { Role } from '@/enums';
 
-import { UserStatus } from '../enums';
 import { BaseEntity } from './base';
+import { PaymentEntity } from './payment.entity';
 
 @Entity('tbl_users')
 export class UserEntity extends BaseEntity {
@@ -31,4 +33,7 @@ export class UserEntity extends BaseEntity {
 
   @Column({ name: 'last_login_at', nullable: true, type: 'timestamp' })
   lastLoginAt: Date | null;
+
+  @OneToMany(() => PaymentEntity, (payment) => payment.user)
+  payments: PaymentEntity[];
 }

@@ -10,13 +10,12 @@ import { JwtService } from '@nestjs/jwt';
 
 import { WSError } from '@/common/errors';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import { UserStatus } from '@/database';
 
 import { Config } from '@/enums';
 
 import { TAccessTokenPayload } from '../../auth';
 import { IS_PUBLIC_DECORATOR_KEY } from '../../auth/constants';
-import { UsersService } from '../../users';
+import { UsersService, UserStatus } from '../../users';
 import { TCustomSocket } from '../types';
 
 /**

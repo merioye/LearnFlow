@@ -6,12 +6,7 @@ import { BadRequestError, NotFoundError } from '@/common/errors';
 import { IHashService, InjectHashService } from '@/modules/common/hash';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import {
-  TTypeOrmFilterQuery,
-  TTypeOrmSort,
-  UserEntity,
-  UserStatus,
-} from '@/database';
+import { TTypeOrmFilterQuery, TTypeOrmSort, UserEntity } from '@/database';
 import { BaseTypeOrmService } from '@/database/services';
 
 import { TOffsetPaginatedResult } from '@/types';
@@ -19,6 +14,7 @@ import { Role } from '@/enums';
 
 import { FileStatus, FileTrackingService } from '../../storage';
 import { CreateUserDto, GetUserListDto, UpdateUserDto } from '../dtos';
+import { UserStatus } from '../enums';
 import { TUserWithoutPassword } from '../types';
 
 @Injectable()
@@ -53,6 +49,7 @@ export class UsersService extends BaseTypeOrmService<UserEntity> {
         lastLoginAt: null,
         profileUrl: null,
         status: UserStatus.ACTIVE,
+        payments: [],
       },
     });
 
@@ -133,7 +130,7 @@ export class UsersService extends BaseTypeOrmService<UserEntity> {
 
       const { password: _, ...restUserDetails } = await this.updateById({
         id: userId,
-        data: { $set: input },
+        data: { $set: { ...input, payments: isUserExists.payments } },
         options: { queryRunner },
       });
 

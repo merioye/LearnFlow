@@ -6,11 +6,10 @@ import { MoreThan } from 'typeorm';
 import { NotAuthorizedError } from '@/common/errors';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
-import { UserStatus } from '@/database';
 
 import { Config } from '@/enums';
 
-import { UsersService } from '../../users';
+import { UsersService, UserStatus } from '../../users';
 import { RefreshTokensService } from '../services';
 import { TCustomRequest, TRefreshTokenPayload } from '../types';
 

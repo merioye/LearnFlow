@@ -24,9 +24,3 @@ export enum AuditOperation {
   CREATE = 'CREATE',
   UPDATE = 'UPDATE',
 }
-
-export enum UserStatus {
-  ACTIVE = 'active',
-  SUSPENDED = 'suspended',
-  DELETED = 'deleted',
-}

@@ -4,10 +4,10 @@ import { DataSource, In } from 'typeorm';
 
 import { BadRequestError, NotFoundError } from '@/common/errors';
 import { IDateTime, InjectDateTime } from '@/modules/common/helper/date-time';
-import { PermissionEntity, UserPermissionEntity, UserStatus } from '@/database';
+import { PermissionEntity, UserPermissionEntity } from '@/database';
 import { BaseTypeOrmService } from '@/database/services';
 
-import { UsersService } from '../../users';
+import { UsersService, UserStatus } from '../../users';
 import { AssignUserPermissionDto } from '../dtos';
 import { PermissionsService } from './permissions.service';
 

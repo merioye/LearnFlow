@@ -6,8 +6,8 @@ import {
   TrimString,
   ValidateIfPresent,
 } from '@/core/decorators';
-import { UserStatus } from '@/database';
 
+import { UserStatus } from '../enums';
 import { CreateUserDto } from './create-user.dto';
 
 @IsAtLeastOneFieldProvided()

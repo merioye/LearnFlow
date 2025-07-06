@@ -55,23 +55,6 @@ export const PROVIDER_CONSTANTS = {
 } as const;
 
 /**
- * Event names for internal event system
- */
-export const PAYMENT_EVENTS = {
-  PAYMENT_CREATED: 'payment.created',
-  PAYMENT_COMPLETED: 'payment.completed',
-  PAYMENT_FAILED: 'payment.failed',
-  PAYMENT_REFUNDED: 'payment.refunded',
-  SUBSCRIPTION_CREATED: 'subscription.created',
-  SUBSCRIPTION_UPDATED: 'subscription.updated',
-  SUBSCRIPTION_CANCELLED: 'subscription.cancelled',
-  SETTLEMENT_INITIATED: 'settlement.initiated',
-  SETTLEMENT_COMPLETED: 'settlement.completed',
-  WEBHOOK_RECEIVED: 'webhook.received',
-  WEBHOOK_PROCESSED: 'webhook.processed',
-} as const;
-
-/**
  * Cache keys for payment-related data
  */
 export const CACHE_KEYS = {
@@ -80,17 +63,4 @@ export const CACHE_KEYS = {
   PAYMENT_STATUS: (paymentId: number) => `payment:status:${paymentId}`,
   RATE_LIMIT: (userId: number, method: PaymentMethod) =>
     `ratelimit:${userId}:${method}`,
-} as const;
-
-/**
- * Database table names
- */
-export const TABLE_NAMES = {
-  PAYMENTS: 'tbl_payments',
-  PAYMENT_TRANSACTIONS: 'tbl_payment_transactions',
-  PAYMENT_METHOD_CONFIGS: 'tbl_payment_method_configs',
-  TEACHER_PAYMENT_CONFIGS: 'tbl_teacher_payment_configs',
-  PAYMENT_SETTLEMENTS: 'tbl_payment_settlements',
-  REFUND_REQUESTS: 'tbl_refund_requests',
-  WEBHOOK_LOGS: 'tbl_webhook_logs',
 } as const;
