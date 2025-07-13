@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 import { CustomError } from './custom.error';
+import { ErrorCode } from './enums';
 
 /**
  * InternalServerError is a custom error class that represents a Server Exception.
@@ -15,15 +16,18 @@ import { CustomError } from './custom.error';
  * const error = new InternalServerError('Something went wrong');
  */
 export class InternalServerError extends CustomError {
-  /**
-   * Creates a new InternalServerError instance with the specified error message.
-   * If no message is provided, the default message 'Internal Server Exception' is used.
-   *
-   * @constructor
-   * @param message - The error message.
-   */
-  public constructor(message = 'Internal Server Exception') {
-    super(message, 'InternalServerException', HttpStatus.INTERNAL_SERVER_ERROR);
+  public constructor(
+    message = 'Internal Server Error',
+    errorCode: ErrorCode = ErrorCode.INTERNAL_SERVER_ERROR,
+    context: Record<string, any> = {}
+  ) {
+    super(
+      'InternalServerError',
+      message,
+      errorCode,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      context
+    );
     Object.setPrototypeOf(this, InternalServerError.prototype);
   }
 }

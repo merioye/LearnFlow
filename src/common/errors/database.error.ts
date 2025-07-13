@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 import { CustomError } from './custom.error';
+import { ErrorCode } from './enums';
 
 /**
  * DatabaseError is a custom error class that represents a Database Exception.
@@ -15,15 +16,18 @@ import { CustomError } from './custom.error';
  * const error = new DatabaseError('Operation failed');
  */
 export class DatabaseError extends CustomError {
-  /**
-   * Creates a new DatabaseError instance with the specified error message.
-   * If no message is provided, the default message 'Database Exception' is used.
-   *
-   * @constructor
-   * @param [message='Database Exception'] - The error message.
-   */
-  public constructor(message = 'Database Exception') {
-    super(message, 'DatabaseException', HttpStatus.INTERNAL_SERVER_ERROR);
+  public constructor(
+    message = 'Database Error',
+    errorCode: ErrorCode = ErrorCode.DATABASE_ERROR,
+    context: Record<string, any> = {}
+  ) {
+    super(
+      'DatabaseError',
+      message,
+      errorCode,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      context
+    );
     Object.setPrototypeOf(this, DatabaseError.prototype);
   }
 }

@@ -1,4 +1,4 @@
-import { PaymentMethod, PaymentStatus } from '../enums';
+import { PaymentMethod, PaymentProvider, PaymentStatus } from '../enums';
 import {
   TCapturePaymentInput,
   TCreatePaymentInput,
@@ -15,6 +15,11 @@ import {
  * Defines the contract for payment processing operations
  */
 export interface IPaymentProvider {
+  /**
+   * The name of the provider
+   */
+  name: PaymentProvider;
+
   /**
    * Initialize payment session
    * @param input - Payment processing input

@@ -8,3 +8,4 @@ export * from './not-found.error';
 export * from './request-validation.error';
 export * from './database.error';
 export * from './ws.error';
+export * from './enums';

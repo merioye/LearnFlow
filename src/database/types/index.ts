@@ -6,8 +6,8 @@ import {
   FindOptionsWhere,
   QueryRunner,
   SelectQueryBuilder,
-  StrictUpdateFilter,
 } from 'typeorm';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 import { CursorPaginationDto, OffsetPaginationDto } from '@/common/pagination';
 
@@ -105,7 +105,7 @@ export type TTypeOrmCreateEntity<T extends TBaseTypeOrmEntity> = Omit<
  * Update type for TypeORM entities
  */
 export type TTypeOrmUpdateEntity<T extends TBaseTypeOrmEntity> =
-  StrictUpdateFilter<Omit<T, TTypeOrmUpdateOmitField>>;
+  QueryDeepPartialEntity<Omit<T, TTypeOrmUpdateOmitField>>;
 
 /**
  * Sort type for TypeORM entities

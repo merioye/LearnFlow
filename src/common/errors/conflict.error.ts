@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 import { CustomError } from './custom.error';
+import { ErrorCode } from './enums';
 
 /**
  * ConflictError is a custom error class that represents a Conflict Exception.
@@ -15,15 +16,12 @@ import { CustomError } from './custom.error';
  * const error = new ConflictError('Email already in use');
  */
 export class ConflictError extends CustomError {
-  /**
-   * Creates a new ConflictError instance with the specified error message.
-   * If no message is provided, the default message 'Conflict Exception' is used.
-   *
-   * @constructor
-   * @param [message='Conflict Exception'] - The error message.
-   */
-  public constructor(message = 'Conflict Exception') {
-    super(message, 'ConflictException', HttpStatus.CONFLICT);
+  public constructor(
+    message = 'Conflict Error',
+    errorCode: ErrorCode = ErrorCode.CONFLICT_ERROR,
+    context: Record<string, any> = {}
+  ) {
+    super('ConflictError', message, errorCode, HttpStatus.CONFLICT, context);
     Object.setPrototypeOf(this, ConflictError.prototype);
   }
 }

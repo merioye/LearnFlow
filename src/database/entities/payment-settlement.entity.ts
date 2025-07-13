@@ -7,6 +7,7 @@ import {
   TSettlementItem,
 } from '@/modules/app/payments';
 
+import { PriceTransformer } from '../utils';
 import { BaseEntity } from './base';
 import { PaymentEntity } from './payment.entity';
 import { TeacherPaymentConfigEntity } from './teacher-payment-config.entity';
@@ -66,55 +67,37 @@ export class PaymentSettlementEntity extends BaseEntity {
    * Settlement amounts
    */
   @Column({
-    name: 'gross_amount_cents',
-    type: 'bigint',
-    comment: 'Total sales amount in cents',
-  })
-  grossAmountCents: number;
-
-  @Column({
     name: 'gross_amount',
     type: 'decimal',
-    precision: 12,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     comment: 'Total sales amount',
+    transformer: new PriceTransformer(),
   })
   grossAmount: number;
 
   @Column({
-    name: 'commission_cents',
-    type: 'bigint',
-    comment: 'Admin commission in cents',
-  })
-  commissionCents: number;
-
-  @Column({
     name: 'commission_amount',
     type: 'decimal',
-    precision: 12,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     comment: 'Admin commission amount',
+    transformer: new PriceTransformer(),
   })
   commissionAmount: number;
 
   @Column({
-    name: 'net_amount_cents',
-    type: 'bigint',
-    comment: 'Net amount in cents',
-  })
-  netAmountCents: number;
-
-  @Column({
     name: 'net_amount',
     type: 'decimal',
-    precision: 12,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     comment: 'Amount to be paid to teacher',
+    transformer: new PriceTransformer(),
   })
   netAmount: number;
 
   @Column({
-    type: 'varchar',
+    type: 'char',
     length: 3,
     comment: 'Currency of the settlement',
   })
@@ -130,34 +113,22 @@ export class PaymentSettlementEntity extends BaseEntity {
   commissionRate: number;
 
   @Column({
-    name: 'processing_fees_cents',
-    type: 'bigint',
-    comment: 'Payment processing fees in cents',
-  })
-  processingFeesCents: number;
-
-  @Column({
     name: 'processing_fees',
     type: 'decimal',
-    precision: 12,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     comment: 'Payment processing fees',
+    transformer: new PriceTransformer(),
   })
   processingFees: number;
 
   @Column({
-    name: 'adjustments_cents',
-    type: 'bigint',
-    comment: 'Any adjustments in cents (refunds, chargebacks)',
-  })
-  adjustmentsCents: number;
-
-  @Column({
     name: 'adjustments',
     type: 'decimal',
-    precision: 12,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     comment: 'Any adjustments (refunds, chargebacks)',
+    transformer: new PriceTransformer(),
   })
   adjustments: number;
 

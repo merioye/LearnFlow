@@ -15,6 +15,7 @@ import {
   SelectQueryBuilder,
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 import { DatabaseError, NotFoundError } from '@/common/errors';
 import { RequestContextNamespace } from '@/core/middlewares';
@@ -314,11 +315,12 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
       }
 
       // Increment version
+      // @ts-expect-error False error due to lack of type inference
       updateData[VERSION_COLUMN] = currentVersion + 1;
     }
 
     // Update the entity
-    await repository.update(id, updateData);
+    await repository.update(id, updateData as QueryDeepPartialEntity<T>);
 
     // Return updated entity
     return this.findById({
@@ -352,7 +354,10 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
     const updateData = this._applyAuditFields(data, AuditOperation.UPDATE);
 
     // Update the entities
-    const result = await repository.update(filter, updateData);
+    const result = await repository.update(
+      filter,
+      updateData as QueryDeepPartialEntity<T>
+    );
 
     return result.affected || 0;
   }
@@ -632,6 +637,7 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
 
     // Apply soft delete
     const updateData: TTypeOrmUpdateEntity<T> = {
+      // @ts-expect-error False error due to lack of type inference
       [SOFT_DELETION_COLUMN]: true,
       deletedAt: this.dateTime.toUTC(this.dateTime.now()),
     };
@@ -644,10 +650,11 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
       this.columnNames.includes('deletedBy') &&
       currentUserId
     ) {
+      // @ts-expect-error False error due to lack of type inference
       updateData['deletedBy'] = { id: currentUserId };
     }
 
-    await repository.update(id, updateData);
+    await repository.update(id, updateData as QueryDeepPartialEntity<T>);
 
     return entity;
   }
@@ -697,6 +704,7 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
 
     // Apply soft delete
     const updateData: TTypeOrmUpdateEntity<T> = {
+      // @ts-expect-error False error due to lack of type inference
       [SOFT_DELETION_COLUMN]: true,
       deletedAt: this.dateTime.toUTC(this.dateTime.now()),
     };
@@ -709,10 +717,14 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
       this.columnNames.includes('deletedBy') &&
       currentUserId
     ) {
+      // @ts-expect-error False error due to lack of type inference
       updateData['deletedBy'] = { id: currentUserId };
     }
 
-    const result = await repository.update(filter, updateData);
+    const result = await repository.update(
+      filter,
+      updateData as QueryDeepPartialEntity<T>
+    );
     return result.affected || 0;
   }
 
@@ -775,12 +787,13 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
 
     // Apply restore
     const updateData: TTypeOrmUpdateEntity<T> = {
+      // @ts-expect-error False error due to lack of type inference
       [SOFT_DELETION_COLUMN]: false,
       deletedAt: null,
       deletedBy: null,
     };
 
-    await repository.update(id, updateData);
+    await repository.update(id, updateData as QueryDeepPartialEntity<T>);
 
     return this.findById({
       id,
@@ -816,6 +829,7 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
 
     // Apply restore
     const updateData: TTypeOrmUpdateEntity<T> = {
+      // @ts-expect-error False error due to lack of type inference
       [SOFT_DELETION_COLUMN]: false,
       deletedAt: null,
       deletedBy: null,
@@ -826,7 +840,7 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
         ...filter,
         [SOFT_DELETION_COLUMN]: true,
       },
-      updateData
+      updateData as QueryDeepPartialEntity<T>
     );
     return result.affected || 0;
   }
@@ -1157,7 +1171,7 @@ export class BaseTypeOrmService<T extends TBaseTypeOrmEntity> {
       // Update existing entity
       return this.updateById({
         id: existing.id,
-        data: data as TTypeOrmUpdateEntity<T>,
+        data: data as unknown as TTypeOrmUpdateEntity<T>,
         options,
       });
     }

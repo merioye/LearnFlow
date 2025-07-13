@@ -2,11 +2,12 @@ import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 
 import {
   Currency,
-  PaymentMethod,
+  PaymentProvider,
   PaymentStatus,
   ProviderTransactionType,
 } from '@/modules/app/payments';
 
+import { PriceTransformer } from '../utils';
 import { BaseEntity } from './base';
 import { PaymentEntity } from './payment.entity';
 
@@ -45,7 +46,7 @@ export class PaymentTransactionEntity extends BaseEntity {
     comment: 'Payment provider used for this transaction',
   })
   @Index()
-  provider: PaymentMethod;
+  provider: PaymentProvider;
 
   @Column({
     type: 'varchar',
@@ -57,22 +58,16 @@ export class PaymentTransactionEntity extends BaseEntity {
   providerTransactionId: string | null;
 
   @Column({
-    name: 'amount_cents',
-    type: 'bigint',
-    comment: 'Transaction amount in cents',
-  })
-  amountCents: number;
-
-  @Column({
     type: 'decimal',
-    precision: 12,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     comment: 'Transaction amount in standard currency unit',
+    transformer: new PriceTransformer(),
   })
   amount: number;
 
   @Column({
-    type: 'varchar',
+    type: 'char',
     length: 3,
     comment: 'Currency code',
   })
@@ -120,20 +115,13 @@ export class PaymentTransactionEntity extends BaseEntity {
   errorMessage: string | null;
 
   @Column({
-    name: 'provider_fee_cents',
-    type: 'bigint',
-    nullable: true,
-    comment: 'Provider fees in cents for this transaction',
-  })
-  providerFeeCents: number | null;
-
-  @Column({
     name: 'provider_fee',
     type: 'decimal',
-    precision: 10,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     nullable: true,
     comment: 'Provider fees in standard currency unit for this transaction',
+    transformer: new PriceTransformer(),
   })
   providerFee: number | null;
 

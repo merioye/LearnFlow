@@ -1,7 +1,9 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 
 import { CourseLevel, CourseStatus } from '@/modules/app/courses';
+import { Currency } from '@/modules/app/payments';
 
+import { PriceTransformer } from '../utils';
 import { BaseEntity } from './base';
 import { UserEntity } from './user.entity';
 
@@ -28,12 +30,19 @@ export class CourseEntity extends BaseEntity {
   category: string;
 
   @Column({
-    name: 'price_usd_cents',
-    type: 'integer',
-    default: 0,
-    comment: 'Price in USD cents',
+    type: 'char',
+    length: 3,
+    comment: 'Currency code(ISO) of the course price',
   })
-  priceUsdCents: number;
+  currency: Currency;
+
+  @Column({
+    type: 'decimal',
+    precision: 19,
+    scale: 4,
+    transformer: new PriceTransformer(),
+  })
+  price: number;
 
   @Column({
     type: 'text',

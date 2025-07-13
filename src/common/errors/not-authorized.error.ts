@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 import { CustomError } from './custom.error';
+import { ErrorCode } from './enums';
 
 /**
  * NotAuthorizedError is a custom error class that represents a Not Authorized Exception.
@@ -15,15 +16,18 @@ import { CustomError } from './custom.error';
  * const error = new NotAuthorizedError('You are not authorized to access this resource');
  */
 export class NotAuthorizedError extends CustomError {
-  /**
-   * Creates a new NotAuthorizedError instance with the specified error message.
-   * If no message is provided, the default message 'Not Authorized' is used.
-   *
-   * @constructor
-   * @param [message='Not Authorized'] - The error message.
-   */
-  public constructor(message = 'Not Authorized') {
-    super(message, 'NotAuthorizedException', HttpStatus.UNAUTHORIZED);
+  public constructor(
+    message = 'Not Authorized',
+    errorCode: ErrorCode = ErrorCode.NOT_AUTHORIZED_ERROR,
+    context: Record<string, any> = {}
+  ) {
+    super(
+      'NotAuthorizedError',
+      message,
+      errorCode,
+      HttpStatus.UNAUTHORIZED,
+      context
+    );
     Object.setPrototypeOf(this, NotAuthorizedError.prototype);
   }
 }

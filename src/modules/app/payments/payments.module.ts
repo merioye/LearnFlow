@@ -1,11 +1,19 @@
 import { DynamicModule, Module } from '@nestjs/common';
 
+import { PAYMENTS_MODULE_OPTIONS } from './constants';
 import {
-  PAYMENT_DEFAULTS,
-  PAYMENTS_MODULE_OPTIONS,
-  SUPPORTED_CURRENCIES,
-} from './constants';
-import { Currency } from './enums';
+  IdempotencyService,
+  PaymentManagerService,
+  PaymentMethodConfigurationsService,
+  PaymentOrchestratorService,
+  PaymentSettlementsService,
+  PaymentsService,
+  PaymentTransactionsService,
+  PaymentValidationsService,
+  RefundRequestsService,
+  TeacherPaymentConfigurationsService,
+  WebhookLogsService,
+} from './services';
 import { TPaymentsModuleAsyncOptions, TPaymentsModuleOptions } from './types';
 
 /**
@@ -21,28 +29,40 @@ export class PaymentsModule {
    * @param options - The options for the payments module
    * @returns The dynamic module for the payments module
    */
-  public static register(options: TPaymentsModuleOptions = {}): DynamicModule {
+  public static register(options: TPaymentsModuleOptions): DynamicModule {
     return {
       module: PaymentsModule,
       providers: [
         {
           provide: PAYMENTS_MODULE_OPTIONS,
-          useValue: {
-            defaultCurrency: PAYMENT_DEFAULTS.CURRENCY,
-            supportedCurrencies: Object.keys(SUPPORTED_CURRENCIES),
-            defaultCommissionRate: PAYMENT_DEFAULTS.COMMISSION_RATE,
-            maxRefundDays: PAYMENT_DEFAULTS.MAX_REFUND_DAYS,
-            settlementDelayDays: PAYMENT_DEFAULTS.SETTLEMENT_DELAY_DAYS,
-            webhookRetryAttempts: PAYMENT_DEFAULTS.WEBHOOK_RETRY_ATTEMPTS,
-            webhookRetryDelay: PAYMENT_DEFAULTS.WEBHOOK_RETRY_DELAY,
-            enableSubscriptions: true,
-            enableMultiVendor: true,
-            enableCOD: true,
-            ...options,
-          },
+          useValue: options,
         },
+        IdempotencyService,
+        PaymentValidationsService,
+        PaymentOrchestratorService,
+        PaymentManagerService,
+        PaymentsService,
+        PaymentMethodConfigurationsService,
+        PaymentSettlementsService,
+        PaymentTransactionsService,
+        RefundRequestsService,
+        TeacherPaymentConfigurationsService,
+        WebhookLogsService,
       ],
-      exports: [PAYMENTS_MODULE_OPTIONS],
+      exports: [
+        PAYMENTS_MODULE_OPTIONS,
+        IdempotencyService,
+        PaymentValidationsService,
+        PaymentOrchestratorService,
+        PaymentManagerService,
+        PaymentsService,
+        PaymentMethodConfigurationsService,
+        PaymentSettlementsService,
+        PaymentTransactionsService,
+        RefundRequestsService,
+        TeacherPaymentConfigurationsService,
+        WebhookLogsService,
+      ],
     };
   }
 
@@ -65,26 +85,36 @@ export class PaymentsModule {
             ...args: unknown[]
           ): Promise<TPaymentsModuleOptions> => {
             const config = await options?.useFactory?.(...args);
-            return {
-              defaultCurrency: PAYMENT_DEFAULTS.CURRENCY,
-              supportedCurrencies: Object.keys(
-                SUPPORTED_CURRENCIES
-              ) as Currency[],
-              defaultCommissionRate: PAYMENT_DEFAULTS.COMMISSION_RATE,
-              maxRefundDays: PAYMENT_DEFAULTS.MAX_REFUND_DAYS,
-              settlementDelayDays: PAYMENT_DEFAULTS.SETTLEMENT_DELAY_DAYS,
-              webhookRetryAttempts: PAYMENT_DEFAULTS.WEBHOOK_RETRY_ATTEMPTS,
-              webhookRetryDelay: PAYMENT_DEFAULTS.WEBHOOK_RETRY_DELAY,
-              enableSubscriptions: true,
-              enableMultiVendor: true,
-              enableCOD: true,
-              ...config,
-            };
+            return config;
           },
           inject: options.inject || [],
         },
+        IdempotencyService,
+        PaymentValidationsService,
+        PaymentOrchestratorService,
+        PaymentManagerService,
+        PaymentsService,
+        PaymentMethodConfigurationsService,
+        PaymentSettlementsService,
+        PaymentTransactionsService,
+        RefundRequestsService,
+        TeacherPaymentConfigurationsService,
+        WebhookLogsService,
       ],
-      exports: [PAYMENTS_MODULE_OPTIONS],
+      exports: [
+        PAYMENTS_MODULE_OPTIONS,
+        IdempotencyService,
+        PaymentValidationsService,
+        PaymentOrchestratorService,
+        PaymentManagerService,
+        PaymentsService,
+        PaymentMethodConfigurationsService,
+        PaymentSettlementsService,
+        PaymentTransactionsService,
+        RefundRequestsService,
+        TeacherPaymentConfigurationsService,
+        WebhookLogsService,
+      ],
     };
   }
 
@@ -93,7 +123,7 @@ export class PaymentsModule {
    * @param options - The options for the payments module
    * @returns The dynamic module for the payments module
    */
-  public static forRoot(options: TPaymentsModuleOptions = {}): DynamicModule {
+  public static forRoot(options: TPaymentsModuleOptions): DynamicModule {
     return {
       global: true,
       ...this.register(options),

@@ -1,3 +1,5 @@
+import { ErrorCode } from '@/common/errors';
+
 /**
  * Type representing an error object.
  *
@@ -30,6 +32,8 @@ export type TErrorFormat = {
  * @property {number} statusCode - The HTTP status code of the error
  * @property {string} path - The URL path of the request that caused the error
  * @property {string} method - The HTTP method of the request that caused the error
+ * @property {ErrorCode} errorCode - The error code
+ * @property {Record<string, any>} - Additional information about the error
  */
 export type TLoggerErrorMetadata = {
   id: string;
@@ -38,6 +42,8 @@ export type TLoggerErrorMetadata = {
   statusCode: number;
   path: string;
   method: string;
+  errorCode: ErrorCode;
+  context: Record<string, any>;
 };
 
 /**
@@ -60,6 +66,8 @@ export type TExceptionResponseBody = {
     type: string;
     path: string;
     method: string;
+    errorCode: ErrorCode;
+    context: Record<string, any>;
   };
   errors: Array<TErrorFormat>;
 };

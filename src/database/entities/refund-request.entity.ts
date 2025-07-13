@@ -8,6 +8,7 @@ import {
   TRefundRequestAttachment,
 } from '@/modules/app/payments';
 
+import { PriceTransformer } from '../utils';
 import { BaseEntity } from './base';
 import { PaymentEntity } from './payment.entity';
 import { UserEntity } from './user.entity';
@@ -44,60 +45,41 @@ export class RefundRequestEntity extends BaseEntity {
    * Refund request details
    */
   @Column({
-    name: 'requested_amount_cents',
-    type: 'bigint',
-    comment: 'Requested refund amount in cents',
-  })
-  requestedAmountCents: number;
-
-  @Column({
     name: 'requested_amount',
     type: 'decimal',
-    precision: 10,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     comment: 'Requested refund amount',
+    transformer: new PriceTransformer(),
   })
   requestedAmount: number;
 
   @Column({
-    name: 'approved_amount_cents',
-    type: 'bigint',
-    nullable: true,
-    comment: 'Approved refund amount in cents',
-  })
-  approvedAmountCents: number | null; // May differ from requested
-
-  @Column({
     name: 'approved_amount',
     type: 'decimal',
-    precision: 10,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     nullable: true,
     comment: 'Approved refund amount',
+    transformer: new PriceTransformer(),
   })
-  approvedAmount: number | null;
-
-  @Column({
-    name: 'processed_amount_cents',
-    type: 'bigint',
-    nullable: true,
-    comment: 'Processed refund amount in cents',
-  })
-  processedAmountCents: number | null; // Actual refunded amount
+  approvedAmount: number | null; // May differ from requested
 
   @Column({
     name: 'processed_amount',
     type: 'decimal',
-    precision: 10,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     nullable: true,
     comment: 'Processed refund amount',
+    transformer: new PriceTransformer(),
   })
-  processedAmount: number | null;
+  processedAmount: number | null; // Actual refunded amount
 
   @Column({
-    type: 'varchar',
+    type: 'char',
     default: Currency.USD,
+    length: 3,
     comment: 'Currency of the refund',
   })
   currency: Currency;
@@ -213,20 +195,13 @@ export class RefundRequestEntity extends BaseEntity {
   providerResponse: string | null;
 
   @Column({
-    name: 'processing_fee_cents',
-    type: 'bigint',
-    default: 0,
-    comment: 'Processing fee charged for refund in cents',
-  })
-  processingFeeCents: number;
-
-  @Column({
     name: 'processing_fee',
     type: 'decimal',
-    precision: 10,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     default: 0,
     comment: 'Processing fee charged for refund',
+    transformer: new PriceTransformer(),
   })
   processingFee: number;
 

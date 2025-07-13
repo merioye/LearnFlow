@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsPositive,
   IsString,
   Min,
@@ -13,6 +14,7 @@ import {
 
 import { TrimString, ValidateIfPresent } from '@/core/decorators';
 
+import { Currency } from '../../payments';
 import { SubscriptionTier, SupportLevel } from '../enums';
 
 export class SubscriptionTierPermissionDto {
@@ -43,10 +45,16 @@ export class CreateSubscriptionTierDto {
   @IsNotEmpty({ message: 'Sort order is required' })
   sortOrder: number;
 
-  @Min(1, { message: 'Price must be minimum 1' })
-  @IsInt({ message: 'Price must be an integer' })
+  @IsNumber({ maxDecimalPlaces: 2 }, { message: 'Price must be a number' })
+  @Min(0.01, { message: 'Price must be at least 0.01' })
   @IsNotEmpty({ message: 'Price is required' })
-  priceUsdCents: number;
+  price: number;
+
+  @IsEnum(Currency, {
+    message: `Invalid currency, Allowed values are ${Object.values(Currency).join(', ')}`,
+  })
+  @IsNotEmpty({ message: 'Currency is required' })
+  currency: Currency;
 
   @ValidateIfPresent()
   @IsBoolean({ message: 'IsActive must be a boolean' })

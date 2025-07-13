@@ -1,15 +1,17 @@
 import { Column, Entity, Index, OneToMany } from 'typeorm';
 
+import { Currency } from '@/modules/app/payments';
 import {
   SubscriptionTier,
   SupportLevel,
 } from '@/modules/app/subscription-tiers';
 
+import { PriceTransformer } from '../utils';
 import { BaseEntity } from './base';
 import { SubscriptionTierPermissionEntity } from './subscription-tier-permission.entity';
 
 @Entity({ name: 'tbl_subscription_tiers' })
-@Index(['isActive', 'priceUsdCents', 'sortOrder'])
+@Index(['isActive', 'price', 'sortOrder'])
 export class SubscriptionTierEntity extends BaseEntity {
   @Column({ name: 'tier_code', type: 'text', unique: true })
   @Index()
@@ -38,11 +40,21 @@ export class SubscriptionTierEntity extends BaseEntity {
   sortOrder: number;
 
   @Column({
-    name: 'price_usd_cents',
-    type: 'integer',
-    comment: 'Price in USD cents',
+    type: 'decimal',
+    precision: 19,
+    scale: 4,
+    comment: 'Price of the subscription',
+    transformer: new PriceTransformer(),
   })
-  priceUsdCents: number;
+  price: number;
+
+  @Column({
+    type: 'char',
+    default: Currency.USD,
+    length: 3,
+    comment: 'ISO Currency code',
+  })
+  currency: Currency;
 
   @Column({ name: 'is_active', default: true })
   isActive: boolean;

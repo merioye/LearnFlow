@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 import { CustomError } from './custom.error';
+import { ErrorCode } from './enums';
 
 /**
  * WSError class represents a WebSocket Exception.
@@ -23,12 +24,16 @@ export class WSError extends CustomError {
    * @constructor
    * @param [message='WebSocket Exception'] - The error message.
    * @param [status=HttpStatus.BAD_REQUEST] - The HTTP status code.
+   * @param errorCode -The error code.
+   * @param context - Additional information about the error.
    */
   public constructor(
     message = 'WebSocket Exception',
-    status = HttpStatus.BAD_REQUEST
+    status = HttpStatus.BAD_REQUEST,
+    errorCode: ErrorCode = ErrorCode.WS_ERROR,
+    context: Record<string, any> = {}
   ) {
-    super(message, 'WSException', status);
+    super('WSError', message, errorCode, status, context);
     Object.setPrototypeOf(this, WSError.prototype);
   }
 }

@@ -216,7 +216,7 @@ export class CoursesService extends BaseTypeOrmService<CourseEntity> {
       // Update the course
       const updatedCourse = await this.updateById({
         id,
-        data: { $set: { ...input, publishedAt } },
+        data: { ...input, publishedAt },
         options: { queryRunner },
       });
 
@@ -266,13 +266,17 @@ export class CoursesService extends BaseTypeOrmService<CourseEntity> {
 
       // Clean up thumbnail tracking if exists
       if (course.thumbnailPath) {
-        await this._fileTrackingService.updateMany({
+        const fileTracking = await this._fileTrackingService.findOne({
           filter: { ownerId: userId, filePath: course.thumbnailPath },
-          data: {
-            $inc: { referenceCount: -1 },
-          },
-          options: { queryRunner },
+          queryRunner,
         });
+        if (fileTracking) {
+          await this._fileTrackingService.updateById({
+            id: fileTracking.id,
+            data: { referenceCount: fileTracking.referenceCount - 1 },
+            options: { queryRunner },
+          });
+        }
       }
 
       await this.commitTransaction(queryRunner);
@@ -296,10 +300,17 @@ export class CoursesService extends BaseTypeOrmService<CourseEntity> {
     increment: boolean
   ): Promise<void> {
     try {
+      const course = await this.findById({ id: courseId });
+      if (!course) {
+        throw new NotFoundError('Course not found');
+      }
+
       await this.updateById({
         id: courseId,
         data: {
-          $inc: { totalEnrollments: increment ? 1 : -1 },
+          totalEnrollments: increment
+            ? course.totalEnrollments + 1
+            : course.totalEnrollments - 1,
         },
       });
     } catch (error) {
@@ -324,16 +335,20 @@ export class CoursesService extends BaseTypeOrmService<CourseEntity> {
   ): Promise<void> {
     if (!thumbnailPath) return;
 
-    await this._fileTrackingService.updateMany({
+    const fileTracking = await this._fileTrackingService.findOne({
       filter: { ownerId: userId, filePath: thumbnailPath },
-      data: {
-        $set: {
+      queryRunner,
+    });
+    if (fileTracking) {
+      await this._fileTrackingService.updateById({
+        id: fileTracking.id,
+        data: {
           status: FileStatus.ACTIVE,
           lastReferencedAt: this.dateTime.toUTC(this.dateTime.timestamp),
+          referenceCount: fileTracking.referenceCount + 1,
         },
-        $inc: { referenceCount: 1 },
-      },
-      options: { queryRunner },
-    });
+        options: { queryRunner },
+      });
+    }
   }
 }

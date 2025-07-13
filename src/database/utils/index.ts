@@ -87,3 +87,14 @@ export function toFindManyOptions<T extends TBaseTypeOrmEntity>(
     comment: comment,
   };
 }
+
+// Custom transformer for decimal precision
+export class PriceTransformer {
+  public to(value: number): string {
+    return value?.toFixed(4);
+  }
+
+  public from(value: string): number {
+    return parseFloat(value);
+  }
+}

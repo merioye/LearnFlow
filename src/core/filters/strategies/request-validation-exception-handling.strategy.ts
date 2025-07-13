@@ -28,7 +28,9 @@ export class RequestValidationExceptionHandlingStrategy extends BaseExceptionHan
       request,
       errorId,
       error.getStatus(),
-      error.message
+      error.message,
+      error.errorCode,
+      error.context
     );
     response.errors = error.errors.map((error) => {
       return {

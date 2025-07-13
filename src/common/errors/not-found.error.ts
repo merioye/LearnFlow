@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 import { CustomError } from './custom.error';
+import { ErrorCode } from './enums';
 
 /**
  * NotFoundError class represents a Not Found Exception.
@@ -15,15 +16,12 @@ import { CustomError } from './custom.error';
  * const error = new NotFoundError('Resource not found');
  */
 export class NotFoundError extends CustomError {
-  /**
-   * Creates a new NotFoundError instance with the specified error message.
-   * If no message is provided, the default message 'Not Found' is used.
-   *
-   * @constructor
-   * @param [message='Not Found'] - The error message.
-   */
-  public constructor(message = 'Not Found') {
-    super(message, 'NotFoundException', HttpStatus.NOT_FOUND);
+  public constructor(
+    message = 'Not Found',
+    errorCode: ErrorCode = ErrorCode.NOT_FOUND_ERROR,
+    context: Record<string, any> = {}
+  ) {
+    super('NotFoundError', message, errorCode, HttpStatus.NOT_FOUND, context);
     Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 }

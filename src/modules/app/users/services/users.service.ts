@@ -130,24 +130,26 @@ export class UsersService extends BaseTypeOrmService<UserEntity> {
 
       const { password: _, ...restUserDetails } = await this.updateById({
         id: userId,
-        data: { $set: { ...input, payments: isUserExists.payments } },
+        data: { ...input, payments: isUserExists.payments },
         options: { queryRunner },
       });
 
       if (input.profileUrl && isUserExists.profileUrl !== input.profileUrl) {
-        await this._fileTrackingService.updateMany({
+        const fileTracking = await this._fileTrackingService.findOne({
           filter: { ownerId: userId, filePath: input.profileUrl },
-          data: {
-            $set: {
+          queryRunner,
+        });
+        if (fileTracking) {
+          await this._fileTrackingService.updateById({
+            id: fileTracking.id,
+            data: {
               status: FileStatus.ACTIVE,
               lastReferencedAt: this.dateTime.toUTC(this.dateTime.timestamp),
+              referenceCount: fileTracking.referenceCount + 1,
             },
-            $inc: {
-              referenceCount: 1,
-            },
-          },
-          options: { queryRunner },
-        });
+            options: { queryRunner },
+          });
+        }
       }
       await this.commitTransaction(queryRunner);
 
@@ -168,15 +170,17 @@ export class UsersService extends BaseTypeOrmService<UserEntity> {
       });
 
       if (deletedUser.profileUrl) {
-        await this._fileTrackingService.updateMany({
+        const fileTracking = await this._fileTrackingService.findOne({
           filter: { ownerId: userId, filePath: deletedUser.profileUrl },
-          data: {
-            $inc: {
-              referenceCount: -1,
-            },
-          },
-          options: { queryRunner },
+          queryRunner,
         });
+        if (fileTracking) {
+          await this._fileTrackingService.updateById({
+            id: fileTracking.id,
+            data: { referenceCount: fileTracking.referenceCount - 1 },
+            options: { queryRunner },
+          });
+        }
       }
       await this.commitTransaction(queryRunner);
     } catch (error) {

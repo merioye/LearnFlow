@@ -37,7 +37,7 @@ export class SubscriptionTiersService extends BaseTypeOrmService<SubscriptionTie
       },
       defaultSort: {
         sortOrder: SortDirection.ASC,
-        priceUsdCents: SortDirection.ASC,
+        price: SortDirection.ASC,
       } as const,
     });
   }
@@ -112,7 +112,7 @@ export class SubscriptionTiersService extends BaseTypeOrmService<SubscriptionTie
       // Update the subscription tier
       await this.updateById({
         id,
-        data: { $set: tierData },
+        data: tierData,
         options: { queryRunner },
       });
 

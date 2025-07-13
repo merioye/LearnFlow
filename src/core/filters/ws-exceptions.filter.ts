@@ -36,6 +36,8 @@ export class WSExceptionsFilter implements ExceptionFilter {
         userId: client.data?.user?.userId || null,
         stack: exception?.stack || null,
         statusCode: exception?.getStatus(),
+        errorCode: exception?.errorCode,
+        context: exception?.context,
       },
     });
 

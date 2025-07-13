@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 import { CustomError } from './custom.error';
+import { ErrorCode } from './enums';
 
 /**
  * ForbiddenError is a custom error class that represents a Forbidden Exception.
@@ -15,15 +16,12 @@ import { CustomError } from './custom.error';
  * const error = new ForbiddenError('You are not authorized to access this resource');
  */
 export class ForbiddenError extends CustomError {
-  /**
-   * Creates a new ForbiddenError instance with the specified error message.
-   * If no message is provided, the default message 'Action Forbidden' is used.
-   *
-   * @constructor
-   * @param [message='Action Forbidden'] - The error message.
-   */
-  public constructor(message = 'Action Forbidden') {
-    super(message, 'ForbiddenException', HttpStatus.FORBIDDEN);
+  public constructor(
+    message = 'Action Forbidden',
+    errorCode: ErrorCode = ErrorCode.FORBIDDEN_ERROR,
+    context: Record<string, any> = {}
+  ) {
+    super('ForbiddenError', message, errorCode, HttpStatus.FORBIDDEN, context);
     Object.setPrototypeOf(this, ForbiddenError.prototype);
   }
 }

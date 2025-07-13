@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Request } from 'express';
 
+import { ErrorCode } from '@/common/errors';
+
 import { TExceptionResponseBody } from '@/types';
 
 import { IExceptionHandlingStrategy } from '../interfaces';
@@ -33,6 +35,8 @@ export abstract class BaseExceptionHandlingStrategy
    * @param errorId - A unique identifier for this error occurrence.
    * @param statusCode - The HTTP status code for the response.
    * @param message - The error message.
+   * @param errorCode - The error code.
+   * @param context - Additional information about the error
    * @returns A base error response body.
    */
   protected getBaseExceptionResponse(
@@ -40,7 +44,9 @@ export abstract class BaseExceptionHandlingStrategy
     request: Request,
     errorId: string,
     statusCode: number,
-    message: string
+    message: string,
+    errorCode: ErrorCode,
+    context: Record<string, any>
   ): TExceptionResponseBody {
     return {
       statusCode,
@@ -51,6 +57,8 @@ export abstract class BaseExceptionHandlingStrategy
         type: error.constructor.name,
         path: request.path,
         method: request.method,
+        errorCode: errorCode,
+        context: context,
       },
       errors: [
         {

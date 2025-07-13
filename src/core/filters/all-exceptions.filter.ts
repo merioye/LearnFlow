@@ -64,6 +64,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode: responseBody.statusCode,
       path: request.path,
       method: request.method,
+      errorCode: responseBody.errorInfo.errorCode,
+      context: responseBody.errorInfo.context,
     };
 
     if (exception instanceof RequestValidationError) {

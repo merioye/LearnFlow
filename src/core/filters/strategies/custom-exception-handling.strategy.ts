@@ -28,7 +28,9 @@ export class CustomExceptionHandlingStrategy extends BaseExceptionHandlingStrate
       request,
       errorId,
       error.getStatus(),
-      error.message
+      error.message,
+      error.errorCode,
+      error.context
     );
   }
 }

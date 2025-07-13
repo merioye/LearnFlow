@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import {
   EXCHANGE_RATE_API_URL,
-  PROVIDER_CONSTANTS,
+  PAYMENT_PROVIDERS_CONFIG,
   SUPPORTED_CURRENCIES,
 } from '../constants';
 import { Currency, PaymentProvider } from '../enums';
@@ -128,18 +128,18 @@ export class PaymentUtils {
     switch (provider.toUpperCase() as PaymentProvider) {
       case PaymentProvider.STRIPE:
         return (
-          usdAmount >= PROVIDER_CONSTANTS.STRIPE.MIN_AMOUNT_USD &&
-          usdAmount <= PROVIDER_CONSTANTS.STRIPE.MAX_AMOUNT_USD
+          usdAmount >= PAYMENT_PROVIDERS_CONFIG.STRIPE.MIN_AMOUNT_USD &&
+          usdAmount <= PAYMENT_PROVIDERS_CONFIG.STRIPE.MAX_AMOUNT_USD
         );
       case PaymentProvider.PAYPAL:
         return (
-          usdAmount >= PROVIDER_CONSTANTS.PAYPAL.MIN_AMOUNT_USD &&
-          usdAmount <= PROVIDER_CONSTANTS.PAYPAL.MAX_AMOUNT_USD
+          usdAmount >= PAYMENT_PROVIDERS_CONFIG.PAYPAL.MIN_AMOUNT_USD &&
+          usdAmount <= PAYMENT_PROVIDERS_CONFIG.PAYPAL.MAX_AMOUNT_USD
         );
       case PaymentProvider.MANUAL:
         return (
-          usdAmount >= PROVIDER_CONSTANTS.COD.MIN_AMOUNT_USD &&
-          usdAmount <= PROVIDER_CONSTANTS.COD.MAX_AMOUNT_USD
+          usdAmount >= PAYMENT_PROVIDERS_CONFIG.MANUAL.MIN_AMOUNT_USD &&
+          usdAmount <= PAYMENT_PROVIDERS_CONFIG.MANUAL.MAX_AMOUNT_USD
         );
       default:
         return true;

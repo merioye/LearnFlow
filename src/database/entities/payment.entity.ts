@@ -18,6 +18,7 @@ import {
 } from '@/modules/app/payments';
 import { PaymentUtils } from '@/modules/app/payments/utils';
 
+import { PriceTransformer } from '../utils';
 import { BaseEntity } from './base';
 import { PaymentSettlementEntity } from './payment-settlement.entity';
 import { PaymentTransactionEntity } from './payment-transaction.entity';
@@ -101,22 +102,16 @@ export class PaymentEntity extends BaseEntity {
   teacherId: number | null;
 
   @Column({
-    name: 'amount_cents',
-    type: 'bigint',
-    comment: 'Payment amount in the smallest currency unit',
-  })
-  amountCents: number;
-
-  @Column({
     type: 'decimal',
-    precision: 12,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     comment: 'Payment amount in standard currency unit (for convenience)',
+    transformer: new PriceTransformer(),
   })
   amount: number;
 
   @Column({
-    type: 'varchar',
+    type: 'char',
     default: Currency.USD,
     length: 3,
     comment: 'Currency code (ISO 4217)',
@@ -230,38 +225,24 @@ export class PaymentEntity extends BaseEntity {
   commissionRate: number | null;
 
   @Column({
-    name: 'commission_cents',
-    type: 'bigint',
-    nullable: true,
-    comment: 'Commission amount in cents',
-  })
-  commissionCents: number | null;
-
-  @Column({
     name: 'commission_amount',
     type: 'decimal',
-    precision: 12,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     nullable: true,
     comment: 'Commission amount in standard currency unit',
+    transformer: new PriceTransformer(),
   })
   commissionAmount: number | null;
 
   @Column({
-    name: 'net_amount_cents',
-    type: 'bigint',
-    nullable: true,
-    comment: 'Net amount after commission (teacher receives this)',
-  })
-  netAmountCents: number | null;
-
-  @Column({
     name: 'net_amount',
     type: 'decimal',
-    precision: 12,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     nullable: true,
     comment: 'Net amount in standard currency unit',
+    transformer: new PriceTransformer(),
   })
   netAmount: number | null;
 
@@ -320,18 +301,16 @@ export class PaymentEntity extends BaseEntity {
    * Lifecycle hooks
    */
   @BeforeInsert()
-  _beforeInsert(): void {
+  protected _beforeInsert(): void {
     if (!this.paymentReference) {
       this.paymentReference = PaymentUtils.generatePaymentReference('PAY');
     }
     this._calculateCommissionAndNetAmount();
-    this._ensureAmountConsistency();
   }
 
   @BeforeUpdate()
-  _beforeUpdate(): void {
+  protected _beforeUpdate(): void {
     this._calculateCommissionAndNetAmount();
-    this._ensureAmountConsistency();
   }
 
   /**
@@ -347,42 +326,14 @@ export class PaymentEntity extends BaseEntity {
         this.amount,
         this.commissionRate
       );
-      this.commissionCents = PaymentUtils.toSmallestUnit(
-        this.commissionAmount,
-        this.currency
-      );
 
       this.netAmount = PaymentUtils.calculateNetAmount(
         this.amount,
         this.commissionRate
       );
-      this.netAmountCents = PaymentUtils.toSmallestUnit(
-        this.netAmount,
-        this.currency
-      );
     } else {
       this.commissionAmount = 0;
-      this.commissionCents = 0;
       this.netAmount = this.amount;
-      this.netAmountCents = this.amountCents;
-    }
-  }
-
-  /**
-   * Ensure amount and amountCents are consistent
-   * @returns {void}
-   */
-  private _ensureAmountConsistency(): void {
-    if (this.amount && !this.amountCents) {
-      this.amountCents = PaymentUtils.toSmallestUnit(
-        this.amount,
-        this.currency
-      );
-    } else if (this.amountCents && !this.amount) {
-      this.amount = PaymentUtils.fromSmallestUnit(
-        this.amountCents,
-        this.currency
-      );
     }
   }
 }

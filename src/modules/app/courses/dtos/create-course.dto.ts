@@ -1,7 +1,8 @@
-import { IsEnum, IsInt, IsNotEmpty, IsString, Min } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
 import { TrimString, ValidateIfPresent } from '@/core/decorators';
 
+import { Currency } from '../../payments';
 import { CourseLevel, CourseStatus } from '../enums';
 
 export class CreateCourseDto {
@@ -20,10 +21,16 @@ export class CreateCourseDto {
   @IsNotEmpty({ message: 'Category is required' })
   category: string;
 
-  @IsInt({ message: 'Price must be an integer' })
-  @Min(0, { message: 'Price must be minimum 0' })
+  @IsNumber({ maxDecimalPlaces: 2 }, { message: 'Price must be a number' })
+  @Min(0.01, { message: 'Price must be at least 0.01' })
   @IsNotEmpty({ message: 'Price is required' })
-  priceUsdCents: number;
+  price: number;
+
+  @IsEnum(Currency, {
+    message: `Invalid currency, Allowed values are ${Object.values(Currency).join(', ')}`,
+  })
+  @IsNotEmpty({ message: 'Currency is required' })
+  currency: Currency;
 
   @ValidateIfPresent()
   @IsEnum(CourseLevel, {

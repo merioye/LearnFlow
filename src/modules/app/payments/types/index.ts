@@ -1,13 +1,13 @@
-import { PaymentStatus } from 'twilio/lib/rest/api/v2010/account/call/payment';
-
 import {
   Currency,
   PaymentFlowType,
   PaymentMethod,
   PaymentProvider,
   PaymentSettlementSchedule,
+  PaymentStatus,
   PayoutMethod,
   RefundRequestAttachmentType,
+  TransactionType,
 } from '../enums';
 
 /**
@@ -29,25 +29,31 @@ export type TPaymentMetadata = {
   userId: number;
   teacherId?: number;
   flowType: PaymentFlowType;
+  transactionType: TransactionType;
+  paymentProvider: PaymentProvider;
+  paymentMethod: PaymentMethod;
   additionalData?: Record<string, any>;
+  successUrl?: string;
+  cancelUrl?: string;
 };
 
 /**
  * Customer information for payment processing
  */
+export type TCustomerAddress = {
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+};
 export type TCustomerInfo = {
   id: string;
   email: string;
   name: string;
   phone?: string;
-  address?: {
-    line1: string;
-    line2?: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  };
+  address?: TCustomerAddress;
 };
 
 /**
@@ -127,6 +133,33 @@ export type TSystemPaymentConfig = {
   webhookRetryDelay: number; // seconds
 };
 
+export type TPaymentProviderAmountLimit = {
+  MIN_AMOUNT_USD: number;
+  MAX_AMOUNT_USD: number;
+  MIN_AMOUNT_EUR: number;
+  MAX_AMOUNT_EUR: number;
+  MIN_AMOUNT_GBP: number;
+  MAX_AMOUNT_GBP: number;
+  MIN_AMOUNT_CAD: number;
+  MAX_AMOUNT_CAD: number;
+  MIN_AMOUNT_INR: number;
+  MAX_AMOUNT_INR: number;
+  MIN_AMOUNT_PKR: number;
+  MAX_AMOUNT_PKR: number;
+};
+
+export type TPaymentProvidersConfiguration = {
+  [PaymentProvider.STRIPE]: TPaymentProviderAmountLimit & {
+    WEBHOOK_TOLERANCE: number;
+  };
+  [PaymentProvider.PAYPAL]: TPaymentProviderAmountLimit & {
+    WEBHOOK_TOLERANCE: number;
+  };
+  [PaymentProvider.MANUAL]: TPaymentProviderAmountLimit & {
+    CONFIRMATION_TIMEOUT: number;
+  };
+};
+
 /**
  * Configuration options for PaymentsModule
  */
@@ -134,24 +167,29 @@ export type TPaymentsModuleOptions = {
   /**
    * Global payment configuration
    */
-  defaultCurrency?: Currency;
-  supportedCurrencies?: Currency[];
-  defaultCommissionRate?: number;
-  maxRefundDays?: number;
-  settlementDelayDays?: number;
+  defaultCurrency: Currency;
+  supportedCurrencies: Currency[];
+  defaultCommissionRate: number;
+  maxRefundDays: number;
+  settlementDelayDays: number;
 
   /**
    * Webhook configuration
    */
-  webhookRetryAttempts?: number;
-  webhookRetryDelay?: number;
+  webhookRetryAttempts: number;
+  webhookRetryDelay: number;
 
   /**
    * Feature flags
    */
-  enableSubscriptions?: boolean;
-  enableMultiVendor?: boolean;
-  enableCOD?: boolean;
+  enableSubscriptions: boolean;
+  enableMultiVendor: boolean;
+  enableCOD: boolean;
+
+  /**
+   * Payment providers configuration
+   */
+  providersConfiguration: TPaymentProvidersConfiguration;
 };
 
 /**
@@ -159,7 +197,7 @@ export type TPaymentsModuleOptions = {
  */
 export type TPaymentsModuleAsyncOptions = {
   imports?: any[];
-  useFactory?: (
+  useFactory: (
     ...args: any[]
   ) => Promise<TPaymentsModuleOptions> | TPaymentsModuleOptions;
   inject?: any[];
@@ -302,6 +340,7 @@ export type TSettlementItem = {
   commission: number;
   processingFee: number;
   netAmount: number;
+  currency: Currency;
   transactionDate: Date;
   type: 'payment' | 'refund' | 'chargeback' | 'adjustment';
 };
@@ -360,4 +399,155 @@ export type TPaymentConfigVerificationData = {
   verificationDate?: string;
   rejectionReason?: string;
   requiredActions?: string[];
+};
+
+/**
+ * Idempotency key storage type
+ */
+export type TIdempotencyRecord = {
+  key: string;
+  paymentId: number;
+  response: TPaymentProviderResponse;
+  createdAt: Date;
+  expiresAt: Date;
+};
+
+/**
+ * Payment workflow context
+ */
+export type TPaymentWorkflowContext = {
+  paymentId?: number;
+  transactionId?: number;
+  userId: number;
+  teacherId?: number;
+  provider: PaymentProvider;
+  step: string;
+  metadata: Record<string, any>;
+};
+
+/**
+ * Payment operation result
+ */
+export type TPaymentOperationResult = {
+  success: boolean;
+  paymentId: number;
+  transactionId: number;
+  providerResponse: TPaymentProviderResponse;
+  workflowContext: TPaymentWorkflowContext;
+  errors?: string[];
+  warnings?: string[];
+};
+
+/**
+ * Payment rollback context
+ */
+export type TPaymentRollbackContext = {
+  paymentId: number;
+  transactionId: number;
+  step: string;
+  reason: string;
+  metadata: Record<string, any>;
+};
+
+/**
+ * Payment validation rules interface
+ */
+export type TPaymentValidationRules = {
+  minAmount: number;
+  maxAmount: number;
+  supportedCurrencies: Currency[];
+  supportedMethods: PaymentMethod[];
+  requiresCustomerInfo: boolean;
+  allowsPartialRefunds: boolean;
+};
+
+/**
+ * Payment validation result interface
+ */
+export type TPaymentValidationResult = {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  normalizedData?: Partial<TCreatePaymentInput>;
+};
+
+/**
+ * Payment creation result
+ */
+export type TPaymentCreationResult = {
+  paymentId: number;
+  transactionId: number;
+  status: PaymentStatus;
+  clientSecret?: string;
+  providerTransactionId?: string;
+  requiresAction?: boolean;
+  actionType?: string;
+  actionUrl?: string;
+  metadata?: Record<string, any>;
+  warnings?: string[];
+};
+
+/**
+ * Payment refund result
+ */
+export type TPaymentRefundResult = {
+  paymentId: number;
+  refundTransactionId: number;
+  status: PaymentStatus;
+  refundAmount: number;
+  currency: string;
+  providerTransactionId?: string;
+  metadata?: Record<string, any>;
+};
+
+/**
+ * Payment details
+ */
+export type TPaymentDetails = {
+  id: number;
+  userId: number;
+  teacherId?: number;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  description?: string;
+  metadata?: Record<string, any>;
+  createdAt: Date;
+  updatedAt: Date;
+  processedAt?: Date;
+  failedAt?: Date;
+  refundedAt?: Date;
+  transactions: Array<{
+    id: number;
+    type: string;
+    status: PaymentStatus;
+    amount: number;
+    providerTransactionId?: string;
+    createdAt: Date;
+    completedAt?: Date;
+    errorMessage?: string;
+  }>;
+};
+
+export type TPaymentStatistics = {
+  totalPayments: number;
+  totalAmount: number;
+  successfulPayments: number;
+  failedPayments: number;
+  refundedPayments: number;
+};
+
+/**
+ * Error context for enhanced logging and debugging
+ */
+export type TPaymentErrorContext = {
+  paymentId?: number;
+  userId?: number;
+  teacherId?: number;
+  provider?: string;
+  method?: string;
+  amount?: number;
+  currency?: string;
+  operation?: string;
+  metadata?: Record<string, any>;
 };

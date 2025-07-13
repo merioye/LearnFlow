@@ -1,6 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 
+import { ErrorCode } from '@/common/errors';
+
 import { TExceptionResponseBody } from '@/types';
 
 import { BaseExceptionHandlingStrategy } from './base-exception-handling.strategy';
@@ -32,7 +34,9 @@ export class DefaultExceptionHandlingStrategy extends BaseExceptionHandlingStrat
       request,
       errorId,
       HttpStatus.INTERNAL_SERVER_ERROR,
-      message
+      message,
+      ErrorCode.INTERNAL_SERVER_ERROR,
+      {}
     );
     if (!isProduction && response.errors[0]) {
       response.errors[0].stack = error.stack || null;

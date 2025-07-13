@@ -11,6 +11,7 @@ import {
   TPayoutConfig,
 } from '@/modules/app/payments';
 
+import { PriceTransformer } from '../utils';
 import { BaseEntity } from './base';
 import { UserEntity } from './user.entity';
 
@@ -153,10 +154,19 @@ export class TeacherPaymentConfigEntity extends BaseEntity {
   @Column({
     name: 'total_payout_amount',
     type: 'decimal',
-    precision: 15,
-    scale: 2,
+    precision: 19,
+    scale: 4,
     default: 0,
     comment: 'Total amount paid out to this teacher',
+    transformer: new PriceTransformer(),
   })
   totalPayoutAmount: number;
+
+  @Column({
+    type: 'char',
+    default: Currency.USD,
+    length: 3,
+    comment: 'ISO Currency code',
+  })
+  currency: Currency;
 }

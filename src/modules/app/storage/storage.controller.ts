@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { NotFoundError } from '@/common/errors';
 import { ApiResponse } from '@/common/utils';
 import { ILogger, InjectLogger } from '@/modules/common/logger';
 
@@ -112,12 +113,17 @@ export class StorageController {
       },
     });
 
-    await this._fileTrackingService.updateMany({
+    const fileTracking = await this._fileTrackingService.findOne({
       filter: { filePath: decodedFilePath, ownerId: currentUserId },
+    });
+    if (!fileTracking) {
+      throw new NotFoundError('File not found');
+    }
+
+    await this._fileTrackingService.updateById({
+      id: fileTracking.id,
       data: {
-        $inc: {
-          referenceCount: -1,
-        },
+        referenceCount: fileTracking.referenceCount - 1,
       },
     });
 

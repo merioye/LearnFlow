@@ -7,7 +7,7 @@ import {
   NotificationsModule,
   notificationsModuleConfig,
 } from './notifications';
-import { PaymentsModule } from './payments';
+import { paymentModuleOptions, PaymentsModule } from './payments';
 import { StorageModule } from './storage';
 import { SubscriptionTiersModule } from './subscription-tiers';
 import { UsersModule } from './users';
@@ -29,7 +29,7 @@ import { WebsocketsModule } from './websockets';
     NotificationsModule.forRoot(notificationsModuleConfig),
     CoursesModule,
     SubscriptionTiersModule,
-    PaymentsModule,
+    PaymentsModule.register(paymentModuleOptions),
   ],
 })
 export class ApplicationModule {}
